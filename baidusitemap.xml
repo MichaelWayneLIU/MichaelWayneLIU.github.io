@@ -3,6 +3,76 @@
 
 
     
+  <url>
+    <loc>https://michaelwayneliu.github.io/2018/01/12/service-worker-xss%E8%BF%9B%E5%8C%96/</loc>
+    <lastmod>2018-01-12T14:42:10.851Z</lastmod>
+    <data>
+        <display>
+        <title>service worker--xss进化</title>
+        <pubTime>2018-01-12T14:19:21.000Z</pubTime>
+        
+        <tag>XSS</tag>
+         
+        <tag>JSONP</tag>
+         
+        <tag>Service Worker</tag>
+         
+         
+           
+             
+              <breadCrumb title="前端安全" url="https://michaelwayneliu.github.io/categories/%E5%89%8D%E7%AB%AF%E5%AE%89%E5%85%A8/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://michaelwayneliu.github.io/2017/12/21/%E5%8D%9A%E5%AE%A2%E8%BF%81%E7%A7%BB%E5%8F%8Ajacman%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE/</loc>
+    <lastmod>2017-12-21T11:37:40.199Z</lastmod>
+    <data>
+        <display>
+        <title>博客迁移及jacman主题配置</title>
+        <pubTime>2017-12-21T11:31:19.000Z</pubTime>
+        
+        <tag>博客迁移</tag>
+         
+        <tag>jacman主题配置</tag>
+         
+         
+           
+             
+              <breadCrumb title="博客" url="https://michaelwayneliu.github.io/categories/%E5%8D%9A%E5%AE%A2/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://michaelwayneliu.github.io/2017/12/21/SOME%E6%94%BB%E5%87%BB/</loc>
+    <lastmod>2017-12-21T11:18:32.638Z</lastmod>
+    <data>
+        <display>
+        <title>SOME攻击</title>
+        <pubTime>2017-12-21T13:54:47.000Z</pubTime>
+        
+        <tag>SOME攻击</tag>
+         
+        <tag>XSS</tag>
+         
+        <tag>JSONP</tag>
+         
+         
+           
+             
+              <breadCrumb title="前端安全" url="https://michaelwayneliu.github.io/categories/%E5%89%8D%E7%AB%AF%E5%AE%89%E5%85%A8/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
     
   <url>
     <loc>https://michaelwayneliu.github.io/2017/03/06/java/</loc>
