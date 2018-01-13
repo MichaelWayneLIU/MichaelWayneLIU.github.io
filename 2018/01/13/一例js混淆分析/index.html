@@ -1,0 +1,707 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>一例js混淆分析 | MSAREHERE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="MS">
+    
+
+    
+    <meta name="description" content="JS混淆分析">
+<meta name="keywords" content="混淆,JS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一例js混淆分析">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2018/01/13/一例js混淆分析/index.html">
+<meta property="og:site_name" content="MSAREHERE">
+<meta property="og:description" content="JS混淆分析">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-13T02:48:53.454Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一例js混淆分析">
+<meta name="twitter:description" content="JS混淆分析">
+
+    
+    <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="MSAREHERE" title="MSAREHERE"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="MSAREHERE">MSAREHERE</a></h1>
+				<h2 class="blog-motto">Just have a little faith</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页 | Home</a></li>
+					
+						<li><a href="/archives">归档 | Archives</a></li>
+					
+						<li><a href="/categories">分类 | Categories</a></li>
+					
+						<li><a href="/tags">标签 | Tags</a></li>
+					
+						<li><a href="/about">关于 | About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:michaelwayneliu.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/01/13/一例js混淆分析/" title="一例js混淆分析" itemprop="url">一例js混淆分析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
+		
+  <p class="article-time">
+    <time datetime="2018-01-13T02:46:21.000Z" itemprop="datePublished"> 发表于 2018-01-13</time>
+    <span id="busuanzi_container_page_pv">
+    总阅读<span id="busuanzi_value_page_pv"></span>次
+</span>
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#拿到代码找思路"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x62FF;&#x5230;&#x4EE3;&#x7801;&#x627E;&#x601D;&#x8DEF;" class="headerlink" title="&#x62FF;&#x5230;&#x4EE3;&#x7801;&#x627E;&#x601D;&#x8DEF;"></a>&#x62FF;&#x5230;&#x4EE3;&#x7801;&#x627E;&#x601D;&#x8DEF;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分析语法逆向"><span class="toc-number">2.</span> <span class="toc-text"><a href="#&#x5206;&#x6790;&#x8BED;&#x6CD5;&#x9006;&#x5411;" class="headerlink" title="&#x5206;&#x6790;&#x8BED;&#x6CD5;&#x9006;&#x5411;"></a>&#x5206;&#x6790;&#x8BED;&#x6CD5;&#x9006;&#x5411;</span></a></li></ol>
+		
+		</div>
+		
+		<p>JS混淆分析<br><a id="more"></a></p>
+<h3 id="拿到代码找思路"><a href="#拿到代码找思路" class="headerlink" title="拿到代码找思路"></a>拿到代码找思路</h3><p>第一次处理混淆，找了半天找到了<a href="http://cnodejs.org/topic/55b3116c692e0e7706b36754" target="_blank" rel="noopener">这个</a><br>，于是接下来要做的事就是针对下面三个点做逆向分析</p>
+<ul>
+<li>字符串字面量混淆：首先提取全部的字符串，在全局作用域创建一个字符串数组，同时转义字符增大阅读难度，然后将字符串出现的地方替换成为数组元素的引用。</li>
+<li>变量名混淆：不同于压缩器的缩短命名，此处使用了下划线加数字的格式，变量之间区分度很低，相比单个字母更难以阅读。</li>
+<li>成员运算符混淆：在 Javascript 中，window[‘top’] 和 window.top 是等价的。混淆器便利用这一特性，将成员访问复杂化，首先替换成字符串，然后对字符串进行混淆。<h3 id="分析语法逆向"><a href="#分析语法逆向" class="headerlink" title="分析语法逆向"></a>分析语法逆向</h3>使用工具 JavascriptObfuscator ，以 esprima 作为 javascript parser 工具，代码在<a href="http://cnodejs.org/topic/55b3116c692e0e7706b36754" target="_blank" rel="noopener">这</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var _0x180a=[&apos;random&apos;,&apos;charCodeAt&apos;,&apos;fromCharCode&apos;,&apos;parse&apos;,&apos;substr&apos;,&apos;\x5cw+&apos;,&apos;replace&apos;,&apos;(3()&#123;(3\x20a()&#123;7&#123;(3\x20b(2)&#123;9((\x27\x27+(2/2)).5!==1||2%g===0)&#123;(3()&#123;&#125;).8(\x274\x27)()&#125;c&#123;4&#125;b(++2)&#125;)(0)&#125;d(e)&#123;f(a,6)&#125;&#125;)()&#125;)();&apos;,&apos;||i|function|debugger|length|5000|try|constructor|if|||else|catch||setTimeout|20&apos;,&apos;pop&apos;,&apos;length&apos;,&apos;join&apos;,&apos;getElementById&apos;,&apos;message&apos;,&apos;log&apos;,&apos;Welcome\x20to\x20HCTF:&gt;&apos;,&apos;Congratulations!\x20you\x20got\x20it!&apos;,&apos;Sorry,\x20you\x20are\x20wrong...&apos;,&apos;window.console.clear();window.console.log(\x27Welcome\x20to\x20HCTF\x20:&gt;\x27)&apos;,&apos;version&apos;,&apos;error&apos;,&apos;download&apos;,&apos;substring&apos;,&apos;push&apos;,&apos;Function&apos;,&apos;charAt&apos;,&apos;idle&apos;,&apos;pyW5F1U43VI&apos;,&apos;init&apos;,&apos;https://the-extension.com&apos;,&apos;local&apos;,&apos;storage&apos;,&apos;eval&apos;,&apos;then&apos;,&apos;get&apos;,&apos;getTime&apos;,&apos;setUTCHours&apos;,&apos;origin&apos;,&apos;set&apos;,&apos;GET&apos;,&apos;loading&apos;,&apos;status&apos;,&apos;removeListener&apos;,&apos;onUpdated&apos;,&apos;callee&apos;,&apos;addListener&apos;,&apos;onMessage&apos;,&apos;runtime&apos;,&apos;executeScript&apos;,&apos;data&apos;,&apos;test&apos;,&apos;http://&apos;,&apos;Url\x20error&apos;,&apos;query&apos;,&apos;filter&apos;,&apos;active&apos;,&apos;floor&apos;];(function(_0xd4b7d6,_0xad25ab)&#123;var _0x5e3956=function(_0x1661d3)&#123;while(--_0x1661d3)&#123;_0xd4b7d6[&apos;push&apos;](_0xd4b7d6[&apos;shift&apos;]());&#125;&#125;;_0x5e3956(++_0xad25ab);&#125;(_0x180a,0x1a2));var _0xa180=function(_0x5c351c,_0x2046d8)&#123;_0x5c351c=_0x5c351c-0x0;var _0x26f3b3=_0x180a[_0x5c351c];return _0x26f3b3;&#125;;function check(_0x5b7c0c)&#123;try&#123;var _0x2e2f8d=[&apos;code&apos;,_0xa180(&apos;0x0&apos;),_0xa180(&apos;0x1&apos;),_0xa180(&apos;0x2&apos;),&apos;invalidMonetizationCode&apos;,_0xa180(&apos;0x3&apos;),_0xa180(&apos;0x4&apos;),_0xa180(&apos;0x5&apos;),_0xa180(&apos;0x6&apos;),_0xa180(&apos;0x7&apos;),_0xa180(&apos;0x8&apos;),_0xa180(&apos;0x9&apos;),_0xa180(&apos;0xa&apos;),_0xa180(&apos;0xb&apos;),_0xa180(&apos;0xc&apos;),_0xa180(&apos;0xd&apos;),_0xa180(&apos;0xe&apos;),_0xa180(&apos;0xf&apos;),_0xa180(&apos;0x10&apos;),_0xa180(&apos;0x11&apos;),&apos;url&apos;,_0xa180(&apos;0x12&apos;),_0xa180(&apos;0x13&apos;),_0xa180(&apos;0x14&apos;),_0xa180(&apos;0x15&apos;),_0xa180(&apos;0x16&apos;),_0xa180(&apos;0x17&apos;),_0xa180(&apos;0x18&apos;),&apos;tabs&apos;,_0xa180(&apos;0x19&apos;),_0xa180(&apos;0x1a&apos;),_0xa180(&apos;0x1b&apos;),_0xa180(&apos;0x1c&apos;),_0xa180(&apos;0x1d&apos;),&apos;replace&apos;,_0xa180(&apos;0x1e&apos;),_0xa180(&apos;0x1f&apos;),&apos;includes&apos;,_0xa180(&apos;0x20&apos;),&apos;length&apos;,_0xa180(&apos;0x21&apos;),_0xa180(&apos;0x22&apos;),_0xa180(&apos;0x23&apos;),_0xa180(&apos;0x24&apos;),_0xa180(&apos;0x25&apos;),_0xa180(&apos;0x26&apos;),_0xa180(&apos;0x27&apos;),_0xa180(&apos;0x28&apos;),_0xa180(&apos;0x29&apos;),&apos;toString&apos;,_0xa180(&apos;0x2a&apos;),&apos;split&apos;];var _0x50559f=_0x5b7c0c[_0x2e2f8d[0x5]](0x0,0x4);var _0x5cea12=parseInt(btoa(_0x50559f),0x20);eval(function(_0x200db2,_0x177f13,_0x46da6f,_0x802d91,_0x2d59cf,_0x2829f2)&#123;_0x2d59cf=function(_0x4be75f)&#123;return _0x4be75f[&apos;toString&apos;](_0x177f13);&#125;;if(!&apos;&apos;[&apos;replace&apos;](/^/,String))&#123;while(_0x46da6f--)_0x2829f2[_0x2d59cf(_0x46da6f)]=_0x802d91[_0x46da6f]||_0x2d59cf(_0x46da6f);_0x802d91=[function(_0x5e8f1a)&#123;return _0x2829f2[_0x5e8f1a];&#125;];_0x2d59cf=function()&#123;return _0xa180(&apos;0x2b&apos;);&#125;;_0x46da6f=0x1;&#125;;while(_0x46da6f--)if(_0x802d91[_0x46da6f])_0x200db2=_0x200db2[_0xa180(&apos;0x2c&apos;)](new RegExp(&apos;\x5cb&apos;+_0x2d59cf(_0x46da6f)+&apos;\x5cb&apos;,&apos;g&apos;),_0x802d91[_0x46da6f]);return _0x200db2;&#125;(_0xa180(&apos;0x2d&apos;),0x11,0x11,_0xa180(&apos;0x2e&apos;)[&apos;split&apos;](&apos;|&apos;),0x0,&#123;&#125;));(function(_0x3291b7,_0xced890)&#123;var _0xaed809=function(_0x3aba26)&#123;while(--_0x3aba26)&#123;_0x3291b7[_0xa180(&apos;0x4&apos;)](_0x3291b7[&apos;shift&apos;]());&#125;&#125;;_0xaed809(++_0xced890);&#125;(_0x2e2f8d,_0x5cea12%0x7b));var _0x43c8d1=function(_0x3120e0)&#123;var _0x3120e0=parseInt(_0x3120e0,0x10);var _0x3a882f=_0x2e2f8d[_0x3120e0];return _0x3a882f;&#125;;var _0x1c3854=function(_0x52ba71)&#123;var _0x52b956=&apos;0x&apos;;for(var _0x59c050=0x0;_0x59c050&lt;_0x52ba71[_0x43c8d1(0x8)];_0x59c050++)&#123;_0x52b956+=_0x52ba71[_0x43c8d1(&apos;f&apos;)](_0x59c050)[_0x43c8d1(0xc)](0x10);&#125;return _0x52b956;&#125;;var _0x76e1e8=_0x5b7c0c[_0x43c8d1(0xe)](&apos;_&apos;);var _0x34f55b=(_0x1c3854(_0x76e1e8[0x0][_0x43c8d1(0xd)](-0x2,0x2))^_0x1c3854(_0x76e1e8[0x0][_0x43c8d1(0xd)](0x4,0x1)))%_0x76e1e8[0x0][_0x43c8d1(0x8)]==0x5;if(!_0x34f55b)&#123;return![];&#125;b2c=function(_0x3f9bc5)&#123;var _0x3c3bd8=&apos;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&apos;;var _0x4dc510=[];var _0x4a199f=Math[_0xa180(&apos;0x25&apos;)](_0x3f9bc5[_0x43c8d1(0x8)]/0x5);var _0x4ee491=_0x3f9bc5[_0x43c8d1(0x8)]%0x5;if(_0x4ee491!=0x0)&#123;for(var _0x1e1753=0x0;_0x1e1753&lt;0x5-_0x4ee491;_0x1e1753++)&#123;_0x3f9bc5+=&apos;&apos;;&#125;_0x4a199f+=0x1;&#125;for(_0x1e1753=0x0;_0x1e1753&lt;_0x4a199f;_0x1e1753++)&#123;_0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)](_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5)&gt;&gt;0x3));_0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5)&amp;0x7)&lt;&lt;0x2|_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x1)&gt;&gt;0x6));_0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x1)&amp;0x3f)&gt;&gt;0x1));_0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x1)&amp;0x1)&lt;&lt;0x4|_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x2)&gt;&gt;0x4));_0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x2)&amp;0xf)&lt;&lt;0x1|_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x3)&gt;&gt;0x7));_0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x3)&amp;0x7f)&gt;&gt;0x2));_0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x3)&amp;0x3)&lt;&lt;0x3|_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x4)&gt;&gt;0x5));_0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)](_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753*0x5+0x4)&amp;0x1f));&#125;var _0x545c12=0x0;if(_0x4ee491==0x1)_0x545c12=0x6;else if(_0x4ee491==0x2)_0x545c12=0x4;else if(_0x4ee491==0x3)_0x545c12=0x3;else if(_0x4ee491==0x4)_0x545c12=0x1;for(_0x1e1753=0x0;_0x1e1753&lt;_0x545c12;_0x1e1753++)_0x4dc510[_0xa180(&apos;0x2f&apos;)]();for(_0x1e1753=0x0;_0x1e1753&lt;_0x545c12;_0x1e1753++)_0x4dc510[_0x43c8d1(&apos;1b&apos;)](&apos;=&apos;);(function()&#123;(function _0x3c3bd8()&#123;try&#123;(function _0x4dc510(_0x460a91)&#123;if((&apos;&apos;+_0x460a91/_0x460a91)[_0xa180(&apos;0x30&apos;)]!==0x1||_0x460a91%0x14===0x0)&#123;(function()&#123;&#125;[&apos;constructor&apos;](&apos;debugger&apos;)());&#125;else&#123;debugger;&#125;_0x4dc510(++_0x460a91);&#125;(0x0));&#125;catch(_0x30f185)&#123;setTimeout(_0x3c3bd8,0x1388);&#125;&#125;());&#125;());return _0x4dc510[_0xa180(&apos;0x31&apos;)](&apos;&apos;);&#125;;e=_0x1c3854(b2c(_0x76e1e8[0x2])[_0x43c8d1(0xe)](&apos;=&apos;)[0x0])^0x53a3f32;if(e!=0x4b7c0a73)&#123;return![];&#125;f=_0x1c3854(b2c(_0x76e1e8[0x3])[_0x43c8d1(0xe)](&apos;=&apos;)[0x0])^e;if(f!=0x4315332)&#123;return![];&#125;n=f*e*_0x76e1e8[0x0][_0x43c8d1(0x8)];h=function(_0x4c466e,_0x28871)&#123;var _0x3ea581=&apos;&apos;;for(var _0x2fbf7a=0x0;_0x2fbf7a&lt;_0x4c466e[_0x43c8d1(0x8)];_0x2fbf7a++)&#123;_0x3ea581+=_0x28871(_0x4c466e[_0x2fbf7a]);&#125;return _0x3ea581;&#125;;j=_0x76e1e8[0x1][_0x43c8d1(0xe)](&apos;3&apos;);if(j[0x0][_0x43c8d1(0x8)]!=j[0x1][_0x43c8d1(0x8)]||(_0x1c3854(j[0x0])^_0x1c3854(j[0x1]))!=0x1613)&#123;return![];&#125;k=_0xffcc52=&gt;_0xffcc52[_0x43c8d1(&apos;f&apos;)]()*_0x76e1e8[0x1][_0x43c8d1(0x8)];l=h(j[0x0],k);if(l!=0x2f9b5072)&#123;return![];&#125;m=_0x1c3854(_0x76e1e8[0x4][_0x43c8d1(0xd)](0x0,0x4))-0x48a05362==n%l;function _0x5a6d56(_0x5a25ab,_0x4a4483)&#123;var _0x55b09f=&apos;&apos;;for(var _0x508ace=0x0;_0x508ace&lt;_0x4a4483;_0x508ace++)&#123;_0x55b09f+=_0x5a25ab;&#125;return _0x55b09f;&#125;if(!m||_0x5a6d56(_0x76e1e8[0x4][_0x43c8d1(0xd)](0x5,0x1),0x2)==_0x76e1e8[0x4][_0x43c8d1(0xd)](-0x5,0x4)||_0x76e1e8[0x4][_0x43c8d1(0xd)](-0x2,0x1)-_0x76e1e8[0x4][_0x43c8d1(0xd)](0x4,0x1)!=0x1)&#123;return![];&#125;o=_0x1c3854(_0x76e1e8[0x4][_0x43c8d1(0xd)](0x6,0x2))[_0x43c8d1(0xd)](0x2)==_0x76e1e8[0x4][_0x43c8d1(0xd)](0x6,0x1)[_0x43c8d1(&apos;f&apos;)]()*_0x76e1e8[0x4][_0x43c8d1(0x8)]*0x5;return o&amp;&amp;_0x76e1e8[0x4][_0x43c8d1(0xd)](0x4,0x1)==0x2&amp;&amp;_0x76e1e8[0x4][_0x43c8d1(0xd)](0x6,0x2)==_0x5a6d56(_0x76e1e8[0x4][_0x43c8d1(0xd)](0x7,0x1),0x2);&#125;catch(_0x4cbb89)&#123;console[&apos;log&apos;](&apos;gg&apos;);return![];&#125;&#125;function test()&#123;var _0x5bf136=document[_0xa180(&apos;0x32&apos;)](_0xa180(&apos;0x33&apos;))[&apos;value&apos;];if(_0x5bf136==&apos;&apos;)&#123;console[_0xa180(&apos;0x34&apos;)](_0xa180(&apos;0x35&apos;));return![];&#125;var _0x4d0e29=check(_0x5bf136);if(_0x4d0e29)&#123;alert(_0xa180(&apos;0x36&apos;));&#125;else&#123;alert(_0xa180(&apos;0x37&apos;));&#125;&#125;window[&apos;onload&apos;]=function()&#123;setInterval(_0xa180(&apos;0x38&apos;),0x32);test();&#125;;</span><br></pre></td></tr></table></figure>
+<p>代码瞬间变成了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br></pre></td><td class="code"><pre><span class="line">var _0x180a = [</span><br><span class="line">    &apos;random&apos;,</span><br><span class="line">    &apos;charCodeAt&apos;,</span><br><span class="line">    &apos;fromCharCode&apos;,</span><br><span class="line">    &apos;parse&apos;,</span><br><span class="line">    &apos;substr&apos;,</span><br><span class="line">    &apos;\\w+&apos;,</span><br><span class="line">    &apos;replace&apos;,</span><br><span class="line">    &apos;(3()&#123;(3 a()&#123;7&#123;(3 b(2)&#123;9((\&apos;\&apos;+(2/2)).5!==1||2%g===0)&#123;(3()&#123;&#125;).8(\&apos;4\&apos;)()&#125;c&#123;4&#125;b(++2)&#125;)(0)&#125;d(e)&#123;f(a,6)&#125;&#125;)()&#125;)();&apos;,</span><br><span class="line">    &apos;||i|function|debugger|length|5000|try|constructor|if|||else|catch||setTimeout|20&apos;,</span><br><span class="line">    &apos;pop&apos;,</span><br><span class="line">    &apos;length&apos;,</span><br><span class="line">    &apos;join&apos;,</span><br><span class="line">    &apos;getElementById&apos;,</span><br><span class="line">    &apos;message&apos;,</span><br><span class="line">    &apos;log&apos;,</span><br><span class="line">    &apos;Welcome to HCTF:&gt;&apos;,</span><br><span class="line">    &apos;Congratulations! you got it!&apos;,</span><br><span class="line">    &apos;Sorry, you are wrong...&apos;,</span><br><span class="line">    &apos;window.console.clear();window.console.log(\&apos;Welcome to HCTF :&gt;\&apos;)&apos;,</span><br><span class="line">    &apos;version&apos;,</span><br><span class="line">    &apos;error&apos;,</span><br><span class="line">    &apos;download&apos;,</span><br><span class="line">    &apos;substring&apos;,</span><br><span class="line">    &apos;push&apos;,</span><br><span class="line">    &apos;Function&apos;,</span><br><span class="line">    &apos;charAt&apos;,</span><br><span class="line">    &apos;idle&apos;,</span><br><span class="line">    &apos;pyW5F1U43VI&apos;,</span><br><span class="line">    &apos;init&apos;,</span><br><span class="line">    &apos;https://the-extension.com&apos;,</span><br><span class="line">    &apos;local&apos;,</span><br><span class="line">    &apos;storage&apos;,</span><br><span class="line">    &apos;eval&apos;,</span><br><span class="line">    &apos;then&apos;,</span><br><span class="line">    &apos;get&apos;,</span><br><span class="line">    &apos;getTime&apos;,</span><br><span class="line">    &apos;setUTCHours&apos;,</span><br><span class="line">    &apos;origin&apos;,</span><br><span class="line">    &apos;set&apos;,</span><br><span class="line">    &apos;GET&apos;,</span><br><span class="line">    &apos;loading&apos;,</span><br><span class="line">    &apos;status&apos;,</span><br><span class="line">    &apos;removeListener&apos;,</span><br><span class="line">    &apos;onUpdated&apos;,</span><br><span class="line">    &apos;callee&apos;,</span><br><span class="line">    &apos;addListener&apos;,</span><br><span class="line">    &apos;onMessage&apos;,</span><br><span class="line">    &apos;runtime&apos;,</span><br><span class="line">    &apos;executeScript&apos;,</span><br><span class="line">    &apos;data&apos;,</span><br><span class="line">    &apos;test&apos;,</span><br><span class="line">    &apos;http://&apos;,</span><br><span class="line">    &apos;Url error&apos;,</span><br><span class="line">    &apos;query&apos;,</span><br><span class="line">    &apos;filter&apos;,</span><br><span class="line">    &apos;active&apos;,</span><br><span class="line">    &apos;floor&apos;</span><br><span class="line">];</span><br><span class="line">(function (_0xd4b7d6, _0xad25ab) &#123;</span><br><span class="line">    var _0x5e3956 = function (_0x1661d3) &#123;</span><br><span class="line">        while (--_0x1661d3) &#123;</span><br><span class="line">            _0xd4b7d6.push(_0xd4b7d6.shift());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    _0x5e3956(++_0xad25ab);</span><br><span class="line">&#125;(_0x180a, 418));</span><br><span class="line">var _0xa180 = function (_0x5c351c, _0x2046d8) &#123;</span><br><span class="line">    _0x5c351c = _0x5c351c - 0;</span><br><span class="line">    var _0x26f3b3 = _0x180a[_0x5c351c];</span><br><span class="line">    return _0x26f3b3;</span><br><span class="line">&#125;;</span><br><span class="line">function check(_0x5b7c0c) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        var _0x2e2f8d = [</span><br><span class="line">            &apos;code&apos;,</span><br><span class="line">            _0xa180(&apos;0x0&apos;),</span><br><span class="line">            _0xa180(&apos;0x1&apos;),</span><br><span class="line">            _0xa180(&apos;0x2&apos;),</span><br><span class="line">            &apos;invalidMonetizationCode&apos;,</span><br><span class="line">            _0xa180(&apos;0x3&apos;),</span><br><span class="line">            _0xa180(&apos;0x4&apos;),</span><br><span class="line">            _0xa180(&apos;0x5&apos;),</span><br><span class="line">            _0xa180(&apos;0x6&apos;),</span><br><span class="line">            _0xa180(&apos;0x7&apos;),</span><br><span class="line">            _0xa180(&apos;0x8&apos;),</span><br><span class="line">            _0xa180(&apos;0x9&apos;),</span><br><span class="line">            _0xa180(&apos;0xa&apos;),</span><br><span class="line">            _0xa180(&apos;0xb&apos;),</span><br><span class="line">            _0xa180(&apos;0xc&apos;),</span><br><span class="line">            _0xa180(&apos;0xd&apos;),</span><br><span class="line">            _0xa180(&apos;0xe&apos;),</span><br><span class="line">            _0xa180(&apos;0xf&apos;),</span><br><span class="line">            _0xa180(&apos;0x10&apos;),</span><br><span class="line">            _0xa180(&apos;0x11&apos;),</span><br><span class="line">            &apos;url&apos;,</span><br><span class="line">            _0xa180(&apos;0x12&apos;),</span><br><span class="line">            _0xa180(&apos;0x13&apos;),</span><br><span class="line">            _0xa180(&apos;0x14&apos;),</span><br><span class="line">            _0xa180(&apos;0x15&apos;),</span><br><span class="line">            _0xa180(&apos;0x16&apos;),</span><br><span class="line">            _0xa180(&apos;0x17&apos;),</span><br><span class="line">            _0xa180(&apos;0x18&apos;),</span><br><span class="line">            &apos;tabs&apos;,</span><br><span class="line">            _0xa180(&apos;0x19&apos;),</span><br><span class="line">            _0xa180(&apos;0x1a&apos;),</span><br><span class="line">            _0xa180(&apos;0x1b&apos;),</span><br><span class="line">            _0xa180(&apos;0x1c&apos;),</span><br><span class="line">            _0xa180(&apos;0x1d&apos;),</span><br><span class="line">            &apos;replace&apos;,</span><br><span class="line">            _0xa180(&apos;0x1e&apos;),</span><br><span class="line">            _0xa180(&apos;0x1f&apos;),</span><br><span class="line">            &apos;includes&apos;,</span><br><span class="line">            _0xa180(&apos;0x20&apos;),</span><br><span class="line">            &apos;length&apos;,</span><br><span class="line">            _0xa180(&apos;0x21&apos;),</span><br><span class="line">            _0xa180(&apos;0x22&apos;),</span><br><span class="line">            _0xa180(&apos;0x23&apos;),</span><br><span class="line">            _0xa180(&apos;0x24&apos;),</span><br><span class="line">            _0xa180(&apos;0x25&apos;),</span><br><span class="line">            _0xa180(&apos;0x26&apos;),</span><br><span class="line">            _0xa180(&apos;0x27&apos;),</span><br><span class="line">            _0xa180(&apos;0x28&apos;),</span><br><span class="line">            _0xa180(&apos;0x29&apos;),</span><br><span class="line">            &apos;toString&apos;,</span><br><span class="line">            _0xa180(&apos;0x2a&apos;),</span><br><span class="line">            &apos;split&apos;</span><br><span class="line">        ];</span><br><span class="line">        var _0x50559f = _0x5b7c0c[_0x2e2f8d[5]](0, 4);</span><br><span class="line">        var _0x5cea12 = parseInt(btoa(_0x50559f), 32);</span><br><span class="line">        console.log(_0x5cea12);</span><br><span class="line">        // eval(function (_0x200db2, _0x177f13, _0x46da6f, _0x802d91, _0x2d59cf, _0x2829f2) &#123;</span><br><span class="line">        //     _0x2d59cf = function (_0x4be75f) &#123;</span><br><span class="line">        //         return _0x4be75f.toString(_0x177f13);</span><br><span class="line">        //     &#125;;</span><br><span class="line">        //     if (!&apos;&apos;.replace(/^/, String)) &#123;</span><br><span class="line">        //         while (_0x46da6f--)</span><br><span class="line">        //             _0x2829f2[_0x2d59cf(_0x46da6f)] = _0x802d91[_0x46da6f] || _0x2d59cf(_0x46da6f);</span><br><span class="line">        //         _0x802d91 = [function (_0x5e8f1a) &#123;</span><br><span class="line">        //                 return _0x2829f2[_0x5e8f1a];</span><br><span class="line">        //             &#125;];</span><br><span class="line">        //         _0x2d59cf = function () &#123;</span><br><span class="line">        //             return _0xa180(&apos;0x2b&apos;);</span><br><span class="line">        //         &#125;;</span><br><span class="line">        //         _0x46da6f = 1;</span><br><span class="line">        //     &#125;</span><br><span class="line">        //     ;</span><br><span class="line">        //     while (_0x46da6f--)</span><br><span class="line">        //         if (_0x802d91[_0x46da6f])</span><br><span class="line">        //             _0x200db2 = _0x200db2[_0xa180(&apos;0x2c&apos;)](new RegExp(&apos;\\b&apos; + _0x2d59cf(_0x46da6f) + &apos;\\b&apos;, &apos;g&apos;), _0x802d91[_0x46da6f]);</span><br><span class="line">        //     return _0x200db2;</span><br><span class="line">        // &#125;(_0xa180(&apos;0x2d&apos;), 17, 17, _0xa180(&apos;0x2e&apos;).split(&apos;|&apos;), 0, &#123;&#125;));</span><br><span class="line">        // (function (_0x3291b7, _0xced890) &#123;</span><br><span class="line">        //     var _0xaed809 = function (_0x3aba26) &#123;</span><br><span class="line">        //         while (--_0x3aba26) &#123;</span><br><span class="line">        //             _0x3291b7[_0xa180(&apos;0x4&apos;)](_0x3291b7.shift());</span><br><span class="line">        //         &#125;</span><br><span class="line">        //     &#125;;</span><br><span class="line">        //     _0xaed809(++_0xced890);</span><br><span class="line">        // &#125;(_0x2e2f8d, _0x5cea12 % 123));</span><br><span class="line">        var _0x43c8d1 = function (_0x3120e0) &#123;</span><br><span class="line">            var _0x3120e0 = parseInt(_0x3120e0, 16);</span><br><span class="line">            var _0x3a882f = _0x2e2f8d[_0x3120e0];</span><br><span class="line">            return _0x3a882f;</span><br><span class="line">        &#125;;</span><br><span class="line">        var _0x1c3854 = function (_0x52ba71) &#123;</span><br><span class="line">            var _0x52b956 = &apos;0x&apos;;</span><br><span class="line">            for (var _0x59c050 = 0; _0x59c050 &lt; _0x52ba71[_0x43c8d1(8)]; _0x59c050++) &#123;</span><br><span class="line">                _0x52b956 += _0x52ba71[_0x43c8d1(&apos;f&apos;)](_0x59c050)[_0x43c8d1(12)](16);</span><br><span class="line">            &#125;</span><br><span class="line">            return _0x52b956;</span><br><span class="line">        &#125;;</span><br><span class="line">        var _0x76e1e8 = _0x5b7c0c[_0x43c8d1(14)](&apos;_&apos;);</span><br><span class="line">        var _0x34f55b = (_0x1c3854(_0x76e1e8[0][_0x43c8d1(13)](-2, 2)) ^ _0x1c3854(_0x76e1e8[0][_0x43c8d1(13)](4, 1))) % _0x76e1e8[0][_0x43c8d1(8)] == 5;</span><br><span class="line">        if (!_0x34f55b) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        b2c = function (_0x3f9bc5) &#123;</span><br><span class="line">            var _0x3c3bd8 = &apos;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&apos;;</span><br><span class="line">            var _0x4dc510 = [];</span><br><span class="line">            var _0x4a199f = Math[_0xa180(&apos;0x25&apos;)](_0x3f9bc5[_0x43c8d1(8)] / 5);</span><br><span class="line">            var _0x4ee491 = _0x3f9bc5[_0x43c8d1(8)] % 5;</span><br><span class="line">            if (_0x4ee491 != 0) &#123;</span><br><span class="line">                for (var _0x1e1753 = 0; _0x1e1753 &lt; 5 - _0x4ee491; _0x1e1753++) &#123;</span><br><span class="line">                    _0x3f9bc5 += &apos;&apos;;</span><br><span class="line">                &#125;</span><br><span class="line">                _0x4a199f += 1;</span><br><span class="line">            &#125;</span><br><span class="line">            for (_0x1e1753 = 0; _0x1e1753 &lt; _0x4a199f; _0x1e1753++) &#123;</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)](_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5) &gt;&gt; 3));</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5) &amp; 7) &lt;&lt; 2 | _0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 1) &gt;&gt; 6));</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 1) &amp; 63) &gt;&gt; 1));</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 1) &amp; 1) &lt;&lt; 4 | _0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 2) &gt;&gt; 4));</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 2) &amp; 15) &lt;&lt; 1 | _0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 3) &gt;&gt; 7));</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 3) &amp; 127) &gt;&gt; 2));</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)]((_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 3) &amp; 3) &lt;&lt; 3 | _0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 4) &gt;&gt; 5));</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](_0x3c3bd8[_0x43c8d1(&apos;1d&apos;)](_0x3f9bc5[_0x43c8d1(&apos;f&apos;)](_0x1e1753 * 5 + 4) &amp; 31));</span><br><span class="line">            &#125;</span><br><span class="line">            var _0x545c12 = 0;</span><br><span class="line">            if (_0x4ee491 == 1)</span><br><span class="line">                _0x545c12 = 6;</span><br><span class="line">            else if (_0x4ee491 == 2)</span><br><span class="line">                _0x545c12 = 4;</span><br><span class="line">            else if (_0x4ee491 == 3)</span><br><span class="line">                _0x545c12 = 3;</span><br><span class="line">            else if (_0x4ee491 == 4)</span><br><span class="line">                _0x545c12 = 1;</span><br><span class="line">            for (_0x1e1753 = 0; _0x1e1753 &lt; _0x545c12; _0x1e1753++)</span><br><span class="line">                _0x4dc510[_0xa180(&apos;0x2f&apos;)]();</span><br><span class="line">            for (_0x1e1753 = 0; _0x1e1753 &lt; _0x545c12; _0x1e1753++)</span><br><span class="line">                _0x4dc510[_0x43c8d1(&apos;1b&apos;)](&apos;=&apos;);</span><br><span class="line">            (function () &#123;</span><br><span class="line">                (function _0x3c3bd8() &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        (function _0x4dc510(_0x460a91) &#123;</span><br><span class="line">                            if ((&apos;&apos; + _0x460a91 / _0x460a91)[_0xa180(&apos;0x30&apos;)] !== 1 || _0x460a91 % 20 === 0) &#123;</span><br><span class="line">                                (function () &#123;</span><br><span class="line">                                &#125;.constructor(&apos;debugger&apos;)());</span><br><span class="line">                            &#125; else &#123;</span><br><span class="line">                                debugger;</span><br><span class="line">                            &#125;</span><br><span class="line">                            _0x4dc510(++_0x460a91);</span><br><span class="line">                        &#125;(0));</span><br><span class="line">                    &#125; catch (_0x30f185) &#123;</span><br><span class="line">                        setTimeout(_0x3c3bd8, 5000);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;());</span><br><span class="line">            &#125;());</span><br><span class="line">            return _0x4dc510[_0xa180(&apos;0x31&apos;)](&apos;&apos;);</span><br><span class="line">        &#125;;</span><br><span class="line">        e = _0x1c3854(b2c(_0x76e1e8[2])[_0x43c8d1(14)](&apos;=&apos;)[0]) ^ 87703346;</span><br><span class="line">        if (e != 1266420339) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        f = _0x1c3854(b2c(_0x76e1e8[3])[_0x43c8d1(14)](&apos;=&apos;)[0]) ^ e;</span><br><span class="line">        if (f != 70341426) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        n = f * e * _0x76e1e8[0][_0x43c8d1(8)];</span><br><span class="line">        h = function (_0x4c466e, _0x28871) &#123;</span><br><span class="line">            var _0x3ea581 = &apos;&apos;;</span><br><span class="line">            for (var _0x2fbf7a = 0; _0x2fbf7a &lt; _0x4c466e[_0x43c8d1(8)]; _0x2fbf7a++) &#123;</span><br><span class="line">                _0x3ea581 += _0x28871(_0x4c466e[_0x2fbf7a]);</span><br><span class="line">            &#125;</span><br><span class="line">            return _0x3ea581;</span><br><span class="line">        &#125;;</span><br><span class="line">        j = _0x76e1e8[1][_0x43c8d1(14)](&apos;3&apos;);</span><br><span class="line">        if (j[0][_0x43c8d1(8)] != j[1][_0x43c8d1(8)] || (_0x1c3854(j[0]) ^ _0x1c3854(j[1])) != 5651) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        k = _0xffcc52 =&gt; _0xffcc52[_0x43c8d1(&apos;f&apos;)]() * _0x76e1e8[1][_0x43c8d1(8)];</span><br><span class="line">        l = h(j[0], k);</span><br><span class="line">        if (l != 798707826) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        m = _0x1c3854(_0x76e1e8[4][_0x43c8d1(13)](0, 4)) - 1218466658 == n % l;</span><br><span class="line">        function _0x5a6d56(_0x5a25ab, _0x4a4483) &#123;</span><br><span class="line">            var _0x55b09f = &apos;&apos;;</span><br><span class="line">            for (var _0x508ace = 0; _0x508ace &lt; _0x4a4483; _0x508ace++) &#123;</span><br><span class="line">                _0x55b09f += _0x5a25ab;</span><br><span class="line">            &#125;</span><br><span class="line">            return _0x55b09f;</span><br><span class="line">        &#125;</span><br><span class="line">        if (!m || _0x5a6d56(_0x76e1e8[4][_0x43c8d1(13)](5, 1), 2) == _0x76e1e8[4][_0x43c8d1(13)](-5, 4) || _0x76e1e8[4][_0x43c8d1(13)](-2, 1) - _0x76e1e8[4][_0x43c8d1(13)](4, 1) != 1) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        o = _0x1c3854(_0x76e1e8[4][_0x43c8d1(13)](6, 2))[_0x43c8d1(13)](2) == _0x76e1e8[4][_0x43c8d1(13)](6, 1)[_0x43c8d1(&apos;f&apos;)]() * _0x76e1e8[4][_0x43c8d1(8)] * 5;</span><br><span class="line">        return o &amp;&amp; _0x76e1e8[4][_0x43c8d1(13)](4, 1) == 2 &amp;&amp; _0x76e1e8[4][_0x43c8d1(13)](6, 2) == _0x5a6d56(_0x76e1e8[4][_0x43c8d1(13)](7, 1), 2);</span><br><span class="line">    &#125; catch (_0x4cbb89) &#123;</span><br><span class="line">        console.log(&apos;gg&apos;);</span><br><span class="line">        return ![];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">function test() &#123;</span><br><span class="line">    var _0x5bf136 = document[_0xa180(&apos;0x32&apos;)](_0xa180(&apos;0x33&apos;)).value;</span><br><span class="line">    if (_0x5bf136 == &apos;&apos;) &#123;</span><br><span class="line">        console[_0xa180(&apos;0x34&apos;)](_0xa180(&apos;0x35&apos;));</span><br><span class="line">        return ![];</span><br><span class="line">    &#125;</span><br><span class="line">    var _0x4d0e29 = check(_0x5bf136);</span><br><span class="line">    if (_0x4d0e29) &#123;</span><br><span class="line">        alert(_0xa180(&apos;0x36&apos;));</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        alert(_0xa180(&apos;0x37&apos;));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">window.onload = function () &#123;</span><br><span class="line">    // setInterval(_0xa180(&apos;0x38&apos;), 50);</span><br><span class="line">    test();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>分析语法，注释掉其中与分析无关的debug等操作，发现是直接前端读取标签input内容调用check函数进行判断，返回值得为1。</p>
+<p>接着对字符串字面量混淆做逆向，发现是对某个字符串利用某个变换函数从已有的数组里做映射取值。使用浏览器把脚本直接放进去就可以拿到混淆前的真正字符串。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">var _0x180a = [</span><br><span class="line">    &apos;random&apos;,</span><br><span class="line">    &apos;charCodeAt&apos;,</span><br><span class="line">    &apos;fromCharCode&apos;,</span><br><span class="line">    &apos;parse&apos;,</span><br><span class="line">    &apos;substr&apos;,</span><br><span class="line">    &apos;\\w+&apos;,</span><br><span class="line">    &apos;replace&apos;,</span><br><span class="line">    &apos;(3()&#123;(3 a()&#123;7&#123;(3 b(2)&#123;9((\&apos;\&apos;+(2/2)).5!==1||2%g===0)&#123;(3()&#123;&#125;).8(\&apos;4\&apos;)()&#125;c&#123;4&#125;b(++2)&#125;)(0)&#125;d(e)&#123;f(a,6)&#125;&#125;)()&#125;)();&apos;,</span><br><span class="line">    &apos;||i|function|debugger|length|5000|try|constructor|if|||else|catch||setTimeout|20&apos;,</span><br><span class="line">    &apos;pop&apos;,</span><br><span class="line">    &apos;length&apos;,</span><br><span class="line">    &apos;join&apos;,</span><br><span class="line">    &apos;getElementById&apos;,</span><br><span class="line">    &apos;message&apos;,</span><br><span class="line">    &apos;log&apos;,</span><br><span class="line">    &apos;Welcome to HCTF:&gt;&apos;,</span><br><span class="line">    &apos;Congratulations! you got it!&apos;,</span><br><span class="line">    &apos;Sorry, you are wrong...&apos;,</span><br><span class="line">    &apos;window.console.clear();window.console.log(\&apos;Welcome to HCTF :&gt;\&apos;)&apos;,</span><br><span class="line">    &apos;version&apos;,</span><br><span class="line">    &apos;error&apos;,</span><br><span class="line">    &apos;download&apos;,</span><br><span class="line">    &apos;substring&apos;,</span><br><span class="line">    &apos;push&apos;,</span><br><span class="line">    &apos;Function&apos;,</span><br><span class="line">    &apos;charAt&apos;,</span><br><span class="line">    &apos;idle&apos;,</span><br><span class="line">    &apos;pyW5F1U43VI&apos;,</span><br><span class="line">    &apos;init&apos;,</span><br><span class="line">    &apos;https://the-extension.com&apos;,</span><br><span class="line">    &apos;local&apos;,</span><br><span class="line">    &apos;storage&apos;,</span><br><span class="line">    &apos;eval&apos;,</span><br><span class="line">    &apos;then&apos;,</span><br><span class="line">    &apos;get&apos;,</span><br><span class="line">    &apos;getTime&apos;,</span><br><span class="line">    &apos;setUTCHours&apos;,</span><br><span class="line">    &apos;origin&apos;,</span><br><span class="line">    &apos;set&apos;,</span><br><span class="line">    &apos;GET&apos;,</span><br><span class="line">    &apos;loading&apos;,</span><br><span class="line">    &apos;status&apos;,</span><br><span class="line">    &apos;removeListener&apos;,</span><br><span class="line">    &apos;onUpdated&apos;,</span><br><span class="line">    &apos;callee&apos;,</span><br><span class="line">    &apos;addListener&apos;,</span><br><span class="line">    &apos;onMessage&apos;,</span><br><span class="line">    &apos;runtime&apos;,</span><br><span class="line">    &apos;executeScript&apos;,</span><br><span class="line">    &apos;data&apos;,</span><br><span class="line">    &apos;test&apos;,</span><br><span class="line">    &apos;http://&apos;,</span><br><span class="line">    &apos;Url error&apos;,</span><br><span class="line">    &apos;query&apos;,</span><br><span class="line">    &apos;filter&apos;,</span><br><span class="line">    &apos;active&apos;,</span><br><span class="line">    &apos;floor&apos;</span><br><span class="line">];</span><br><span class="line">(function (_0xd4b7d6, _0xad25ab) &#123;</span><br><span class="line">    var _0x5e3956 = function (_0x1661d3) &#123;</span><br><span class="line">        while (--_0x1661d3) &#123;</span><br><span class="line">            _0xd4b7d6.push(_0xd4b7d6.shift());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    _0x5e3956(++_0xad25ab);</span><br><span class="line">&#125;(_0x180a, 418));</span><br><span class="line">var _0xa180 = function (_0x5c351c, _0x2046d8) &#123;</span><br><span class="line">    _0x5c351c = _0x5c351c - 0;</span><br><span class="line">    var _0x26f3b3 = _0x180a[_0x5c351c];</span><br><span class="line">    return _0x26f3b3;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>check函数里的字符串类似于_0xa180(‘0x19’)，扔到浏览器就行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">a = [&quot;window.console.clear();window.console.log(&apos;Welcome to HCTF :&gt;&apos;)&quot;,&quot;Sorry, you are wrong...&quot;,&quot;Congratulations! you got it!&quot;,&quot;Welcome to HCTF:&gt;&quot;,&quot;log&quot;,&quot;message&quot;,&quot;getElementById&quot;,&quot;join&quot;,&quot;length&quot;,&quot;pop&quot;,&quot;||i|function|debugger|length|5000|try|constructor|if|||else|catch||setTimeout|20&quot;,&quot;(3()&#123;(3 a()&#123;7&#123;(3 b(2)&#123;9((&apos;&apos;+(2/2)).5!==1||2%g===0)&#123;(3()&#123;&#125;).8(&apos;4&apos;)()&#125;c&#123;4&#125;b(++2)&#125;)(0)&#125;d(e)&#123;f(a,6)&#125;&#125;)()&#125;)();&quot;,&quot;replace&quot;,&quot;\w+&quot;,&quot;substr&quot;,&quot;parse&quot;,&quot;fromCharCode&quot;,&quot;charCodeAt&quot;,&quot;random&quot;,&quot;floor&quot;,&quot;active&quot;,&quot;filter&quot;,&quot;query&quot;,&quot;Url error&quot;,&quot;http://&quot;,&quot;test&quot;,&quot;data&quot;,&quot;executeScript&quot;,&quot;runtime&quot;,&quot;onMessage&quot;,&quot;addListener&quot;,&quot;callee&quot;,&quot;onUpdated&quot;,&quot;removeListener&quot;,&quot;status&quot;,&quot;loading&quot;,&quot;GET&quot;,&quot;set&quot;,&quot;origin&quot;,&quot;setUTCHours&quot;,&quot;getTime&quot;,&quot;get&quot;,&quot;then&quot;,&quot;eval&quot;,&quot;storage&quot;,&quot;local&quot;,&quot;https://the-extension.com&quot;,&quot;init&quot;,&quot;pyW5F1U43VI&quot;,&quot;idle&quot;,&quot;charAt&quot;,&quot;Function&quot;,&quot;push&quot;,&quot;substring&quot;,&quot;download&quot;,&quot;error&quot;,&quot;version&quot;]</span><br><span class="line">a = a[::-1]</span><br><span class="line"># print len(a)</span><br><span class="line"># for i in range(57):</span><br><span class="line"># 	print i</span><br><span class="line">for i in range(57):</span><br><span class="line">	s = &quot;_0xa180(&apos;&quot;+hex(i)+&quot;&apos;)&quot;</span><br><span class="line">	t = a[i]</span><br><span class="line">	# print s</span><br><span class="line">	# print t</span><br><span class="line">	with open(&quot;hun.js&quot; , &quot;r+&quot;)as f :</span><br><span class="line">		lines=f.readlines()</span><br><span class="line">		f.seek(0) </span><br><span class="line">		f.truncate()</span><br><span class="line">		for l in lines:</span><br><span class="line">			f.write(l.replace(s , &quot;&apos;&quot;+t+&quot;&apos;&quot;))</span><br><span class="line">		f.close()</span><br></pre></td></tr></table></figure></p>
+<p>通过一段小py替换js里混淆的数组得到check函数里用到的数组</p>
+<p>分析check函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var shuru_1 = shuru.substring(0, 4);</span><br><span class="line">var shuru_2 = parseInt(btoa(shuru_1), 32); // 31</span><br><span class="line"></span><br><span class="line">(function (shuzu, shuru) &#123;</span><br><span class="line">    var shift = function (i) &#123;</span><br><span class="line">        while (--i) &#123;</span><br><span class="line">            shuzu.push(shuzu.shift());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    shift(++shuru);</span><br><span class="line">&#125;(shuzu_2, shuru_2 % 123));</span><br></pre></td></tr></table></figure></p>
+<p>首先是取输入前五位base64编码以32进制解析base64结果得到一个数字，以该数字对数组2移位变换</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var shuzu_2_yingshe = function (shuzi) &#123;</span><br><span class="line">    var shuzi = parseInt(shuzi, 16);</span><br><span class="line">    var yinshejieguo = shuzu_2[shuzi];</span><br><span class="line">    return yinshejieguo;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>然后会对数组2做映射</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for (var i = 0; i &lt; shuzu_2[shuzu_2_yingshe(8)]; i++) &#123;</span><br><span class="line">    str += shuzu_2[shuzu_2_yingshe(&apos;f&apos;)](i)[shuzu_2_yingshe(12)](16);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看到这样的结构，猜想shuzu_2_yingshe(8)应该对应shuzu_2中的length，shuzu_2_yingshe(‘12’)对应toString，结合一开始会以输入对shuzu_2移位，带入hctf{进行测试，结果吻合，说明flag前5位应该就是hctf{</p>
+<p>接下来对所有shuzu_2_yingshe函数映射的地方进行替换</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br></pre></td><td class="code"><pre><span class="line">function check(shuru) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        var shuzu_2 = [</span><br><span class="line">            &apos;code&apos;,</span><br><span class="line">            &apos;version&apos;,</span><br><span class="line">            &apos;error&apos;,</span><br><span class="line">            &apos;download&apos;,</span><br><span class="line">            &apos;invalidMonetizationCode&apos;,</span><br><span class="line">            &apos;substring&apos;,</span><br><span class="line">            &apos;push&apos;,</span><br><span class="line">            &apos;Function&apos;,</span><br><span class="line">            &apos;charAt&apos;,</span><br><span class="line">            &apos;idle&apos;,</span><br><span class="line">            &apos;pyW5F1U43VI&apos;,</span><br><span class="line">            &apos;init&apos;,</span><br><span class="line">            &apos;https://the-extension.com&apos;,</span><br><span class="line">            &apos;local&apos;,</span><br><span class="line">            &apos;storage&apos;,</span><br><span class="line">            &apos;eval&apos;,</span><br><span class="line">            &apos;then&apos;,</span><br><span class="line">            &apos;get&apos;,</span><br><span class="line">            &apos;getTime&apos;,</span><br><span class="line">            &apos;setUTCHours&apos;,</span><br><span class="line">            &apos;url&apos;,</span><br><span class="line">            &apos;origin&apos;,</span><br><span class="line">            &apos;set&apos;,</span><br><span class="line">            &apos;GET&apos;,</span><br><span class="line">            &apos;loading&apos;,</span><br><span class="line">            &apos;status&apos;,</span><br><span class="line">            &apos;removeListener&apos;,</span><br><span class="line">            &apos;onUpdated&apos;,</span><br><span class="line">            &apos;tabs&apos;,</span><br><span class="line">            &apos;callee&apos;,</span><br><span class="line">            &apos;addListener&apos;,</span><br><span class="line">            &apos;onMessage&apos;,</span><br><span class="line">            &apos;runtime&apos;,</span><br><span class="line">            &apos;executeScript&apos;,</span><br><span class="line">            &apos;replace&apos;,</span><br><span class="line">            &apos;data&apos;,</span><br><span class="line">            &apos;test&apos;,</span><br><span class="line">            &apos;includes&apos;,</span><br><span class="line">            &apos;http://&apos;,</span><br><span class="line">            &apos;length&apos;,</span><br><span class="line">            &apos;Url error&apos;,</span><br><span class="line">            &apos;query&apos;,</span><br><span class="line">            &apos;filter&apos;,</span><br><span class="line">            &apos;active&apos;,</span><br><span class="line">            &apos;floor&apos;,</span><br><span class="line">            &apos;random&apos;,</span><br><span class="line">            &apos;charCodeAt&apos;,</span><br><span class="line">            &apos;fromCharCode&apos;,</span><br><span class="line">            &apos;parse&apos;,</span><br><span class="line">            &apos;toString&apos;,</span><br><span class="line">            &apos;substr&apos;,</span><br><span class="line">            &apos;split&apos;</span><br><span class="line">        ];</span><br><span class="line">        var shuru_1 = shuru.substring(0, 4);</span><br><span class="line">        var shuru_2 = parseInt(btoa(shuru_1), 32); // 31</span><br><span class="line"></span><br><span class="line">        (function (shuzu, shuru) &#123;</span><br><span class="line">            var shift = function (i) &#123;</span><br><span class="line">                while (--i) &#123;</span><br><span class="line">                    shuzu.push(shuzu.shift());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            shift(++shuru);</span><br><span class="line">        &#125;(shuzu_2, shuru_2 % 123));</span><br><span class="line">        </span><br><span class="line">        var shuzu_2_yingshe = function (shuzi) &#123;</span><br><span class="line">            var shuzi = parseInt(shuzi, 16);</span><br><span class="line">            var yinshejieguo = shuzu_2[shuzi];</span><br><span class="line">            return yinshejieguo;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        var toHex = function (stri) &#123;</span><br><span class="line">            var str = &apos;0x&apos;;</span><br><span class="line">            for (var i = 0; i &lt; stri.length; i++) &#123;</span><br><span class="line">                str += stri.charCodeAt(i).toString(16);</span><br><span class="line">            &#125;</span><br><span class="line">            return str;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        var shuru_3 = shuru.split(&apos;_&apos;);</span><br><span class="line">        var res = (toHex(shuru_3[0].substr(-2, 2)) ^ toHex(shuru_3[0].substr(4, 1))) % shuru_3[0].length == 5;</span><br><span class="line">        if (!res) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        b2c = function (_0x3f9bc5) &#123;</span><br><span class="line">            var _0x3c3bd8 = &apos;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&apos;;</span><br><span class="line">            var _0x4dc510 = [];</span><br><span class="line">            var _0x4a199f = Math[&apos;floor&apos;](_0x3f9bc5[length] / 5);</span><br><span class="line">            var _0x4ee491 = _0x3f9bc5[length] % 5;</span><br><span class="line">            if (_0x4ee491 != 0) &#123;</span><br><span class="line">                for (var _0x1e1753 = 0; _0x1e1753 &lt; 5 - _0x4ee491; _0x1e1753++) &#123;</span><br><span class="line">                    _0x3f9bc5 += &apos;&apos;;</span><br><span class="line">                &#125;</span><br><span class="line">                _0x4a199f += 1;</span><br><span class="line">            &#125;</span><br><span class="line">            for (_0x1e1753 = 0; _0x1e1753 &lt; _0x4a199f; _0x1e1753++) &#123;</span><br><span class="line">                _0x4dc510[push](_0x3c3bd8[charAt](_0x3f9bc5[charCodeAt](_0x1e1753 * 5) &gt;&gt; 3));</span><br><span class="line">                _0x4dc510[push](_0x3c3bd8[charAt]((_0x3f9bc5[charCodeAt](_0x1e1753 * 5) &amp; 7) &lt;&lt; 2 | _0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 1) &gt;&gt; 6));</span><br><span class="line">                _0x4dc510[push](_0x3c3bd8[charAt]((_0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 1) &amp; 63) &gt;&gt; 1));</span><br><span class="line">                _0x4dc510[push](_0x3c3bd8[charAt]((_0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 1) &amp; 1) &lt;&lt; 4 | _0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 2) &gt;&gt; 4));</span><br><span class="line">                _0x4dc510[push](_0x3c3bd8[charAt]((_0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 2) &amp; 15) &lt;&lt; 1 | _0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 3) &gt;&gt; 7));</span><br><span class="line">                _0x4dc510[push](_0x3c3bd8[charAt]((_0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 3) &amp; 127) &gt;&gt; 2));</span><br><span class="line">                _0x4dc510[push](_0x3c3bd8[charAt]((_0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 3) &amp; 3) &lt;&lt; 3 | _0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 4) &gt;&gt; 5));</span><br><span class="line">                _0x4dc510[push](_0x3c3bd8[charAt](_0x3f9bc5[charCodeAt](_0x1e1753 * 5 + 4) &amp; 31));</span><br><span class="line">            &#125;</span><br><span class="line">            var _0x545c12 = 0;</span><br><span class="line">            if (_0x4ee491 == 1)</span><br><span class="line">                _0x545c12 = 6;</span><br><span class="line">            else if (_0x4ee491 == 2)</span><br><span class="line">                _0x545c12 = 4;</span><br><span class="line">            else if (_0x4ee491 == 3)</span><br><span class="line">                _0x545c12 = 3;</span><br><span class="line">            else if (_0x4ee491 == 4)</span><br><span class="line">                _0x545c12 = 1;</span><br><span class="line">            for (_0x1e1753 = 0; _0x1e1753 &lt; _0x545c12; _0x1e1753++)</span><br><span class="line">                _0x4dc510[&apos;pop&apos;]();</span><br><span class="line">            for (_0x1e1753 = 0; _0x1e1753 &lt; _0x545c12; _0x1e1753++)</span><br><span class="line">                _0x4dc510[push](&apos;=&apos;);</span><br><span class="line">            (function () &#123;</span><br><span class="line">                (function _0x3c3bd8() &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        (function _0x4dc510(_0x460a91) &#123;</span><br><span class="line">                            if ((&apos;&apos; + _0x460a91 / _0x460a91)[&apos;length&apos;] !== 1 || _0x460a91 % 20 === 0) &#123;</span><br><span class="line">                                (function () &#123;</span><br><span class="line">                                &#125;.constructor(&apos;debugger&apos;)());</span><br><span class="line">                            &#125; else &#123;</span><br><span class="line">                                debugger;</span><br><span class="line">                            &#125;</span><br><span class="line">                            _0x4dc510(++_0x460a91);</span><br><span class="line">                        &#125;(0));</span><br><span class="line">                    &#125; catch (_0x30f185) &#123;</span><br><span class="line">                        setTimeout(_0x3c3bd8, 5000);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;());</span><br><span class="line">            &#125;());</span><br><span class="line">            return _0x4dc510[&apos;join&apos;](&apos;&apos;);</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        e = toHex(b2c(shuru_3[2]).split(&apos;=&apos;)[0]) ^ 87703346;  // e=1266420339  1313224001 </span><br><span class="line">        if (e != 1266420339) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        f = toHex(b2c(shuru_3[3]).split(&apos;=&apos;)[0]) ^ e; //f=70341426;e=1266420339  1330469185</span><br><span class="line">        if (f != 70341426) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        n = f * e * shuru_3[0].length; //f=70341426;e=1266420339;</span><br><span class="line">        h = function (input, func) &#123;</span><br><span class="line">            var str = &apos;&apos;;</span><br><span class="line">            for (var i = 0; i &lt; input.length; i++) &#123;</span><br><span class="line">                str += func(input[i]);</span><br><span class="line">            &#125;</span><br><span class="line">            return str;</span><br><span class="line">        &#125;;</span><br><span class="line">        j = shuru_3[1].split(&apos;3&apos;);</span><br><span class="line">        if (j[0].length != j[1].length || (toHex(j[0]) ^ toHex(j[1])) != 5651) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        k = alpha =&gt; alpha.charCodeAt() * shuru_3[1].length;</span><br><span class="line">        l = h(j[0], k);</span><br><span class="line">        if (l != 798707826) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        m = toHex(shuru_3[4].substr(0, 4)) - 1218466658 == n % l; //l=798707826;m=1</span><br><span class="line">        function repeat(input, i) &#123;</span><br><span class="line">            var str = &apos;&apos;;</span><br><span class="line">            for (var j = 0; j &lt; i; j++) &#123;</span><br><span class="line">                str += input;</span><br><span class="line">            &#125;</span><br><span class="line">            return str;</span><br><span class="line">        &#125;</span><br><span class="line">        if (!m || repeat(shuru_3[4].substr(5, 1), 2) == shuru_3[4].substr(-5, 4) || (shuru_3[4].substr(-2, 1) - shuru_3[4].substr(4, 1)) != 1) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        o = toHex(shuru_3[4].substr(6, 2)).substr(2) == shuru_3[4].substr(6, 1).charCodeAt() * shuru_3[4].length * 5;</span><br><span class="line">        return o &amp;&amp; shuru_3[4].substr(4, 1) == 2 &amp;&amp; shuru_3[4].substr(6, 2) == repeat(shuru_3[4].substr(7, 1), 2);</span><br><span class="line">    &#125; catch (_0x4cbb89) &#123;</span><br><span class="line">        console.log(&apos;gg&apos;);</span><br><span class="line">        return ![];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">function test() &#123;</span><br><span class="line">    var val = document.getElementById.(&apos;message&apos;).value;</span><br><span class="line">    if (val == &apos;&apos;) &#123;</span><br><span class="line">        console[&apos;log&apos;](&apos;Welcome to HCTF:&gt;&apos;);</span><br><span class="line">        return ![];</span><br><span class="line">    &#125;</span><br><span class="line">    var result = check(val);</span><br><span class="line">    if (result) &#123;</span><br><span class="line">        alert(&apos;Congratulations! you got it!&apos;);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        alert(&apos;Sorry, you are wrong...&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">window.onload = function () &#123;</span><br><span class="line">    // setInterval(&apos;window.console.clear();window.console.log(&apos;Welcome to HCTF :&gt;&apos;)&apos;, 50);</span><br><span class="line">    test();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>接着分析check内的判断条件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var shuru_3 = shuru.split(&apos;_&apos;);</span><br></pre></td></tr></table></figure>
+<p>输入以_分割分为5部分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var res = (toHex(shuru_3[0].substr(-2, 2)) ^ toHex(shuru_3[0].substr(4, 1))) % shuru_3[0].length == 5;</span><br><span class="line">        if (!res) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>可知res不能为0，而shuru_3[0].length无法得知，继续往下看</p>
+<p>遇到了b2c函数，变换十分复杂，其中出现了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var _0x3c3bd8 = &apos;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&apos;;</span><br></pre></td></tr></table></figure>
+<p>还是师兄见多识广，看出了它是base32变换</p>
+<p>其实不管它是何种变换，根据后面的判断提示直接调用函数，只需要函数结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">j = shuru_3[1].split(&apos;3&apos;);</span><br><span class="line">if (j[0].length != j[1].length || (toHex(j[0]) ^ toHex(j[1])) != 5651) &#123;</span><br><span class="line">    return ![];</span><br><span class="line">&#125;</span><br><span class="line">        k = alpha =&gt; alpha.charCodeAt() * shuru_3[1].length;</span><br><span class="line">        l = h(j[0], k);</span><br><span class="line">        if (l != 798707826) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br><span class="line">        h = function (input, func) &#123;</span><br><span class="line">            var str = &apos;&apos;;</span><br><span class="line">            for (var i = 0; i &lt; input.length; i++) &#123;</span><br><span class="line">                str += func(input[i]);</span><br><span class="line">            &#125;</span><br><span class="line">            return str;</span><br><span class="line">        &#125;;</span><br></pre></td></tr></table></figure>
+<p>可知输入第二部分以3分为两半，两边长度相等，toHex(j[0]) ^ toHex(j[1])) == 5651 ==&gt; 经过测试确定两边长度为2或3，分为以此为条件带入下面的等式“爆破”</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">h = function (input, func) &#123;</span><br><span class="line">    var str = &apos;&apos;;</span><br><span class="line">    for (var i = 0; i &lt; input.length; i++) &#123;</span><br><span class="line">        str += func(input[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    return str;</span><br><span class="line">&#125;;</span><br><span class="line">f = alpha =&gt; alpha.charCodeAt() * 7;</span><br><span class="line">var toHex = function (stri) &#123;</span><br><span class="line">    var str = &apos;0x&apos;;</span><br><span class="line">    for (var i = 0; i &lt; stri.length; i++) &#123;</span><br><span class="line">        str += stri.charCodeAt(i).toString(16);</span><br><span class="line">    &#125;</span><br><span class="line">    return str;</span><br><span class="line">&#125;;</span><br><span class="line">a = &apos;=ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz&apos;</span><br><span class="line">for (var i = a.length - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">      for (var j = a.length - 1; j &gt;= 0; j--) &#123;</span><br><span class="line">            for (var k = a.length - 1; k &gt;= 0; k--) &#123;</span><br><span class="line">                  for (var q = a.length - 1; q &gt;= 0; q--) &#123;</span><br><span class="line">                        if((toHex(a[q]+a[k]) ^ toHex(a[i]+a[j])) == 5651)&#123;</span><br><span class="line">                              for (var z = a.length - 1; z &gt;= 0; z--) &#123;</span><br><span class="line">                                    if ((h(a[z]+a[q]+a[k], f)) == 798707826) &#123;</span><br><span class="line">                                          console.log(a[z]+a[q]+a[k])</span><br><span class="line">                                          console.log(a[z]+a[i]+a[j])</span><br><span class="line">                              &#125;</span><br><span class="line">                              &#125;</span><br><span class="line"></span><br><span class="line">                  &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>丢进浏览器跑，得到输入第二部分为rev3rse</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">e = toHex(b2c(shuru_3[2]).split(&apos;=&apos;)[0]) ^ 87703346;  // e=1266420339  1313224001 </span><br><span class="line">if (e != 1266420339) &#123;</span><br><span class="line">    return ![];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第三四部分更简单了，同样直接爆破</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">toHex(b2c(shuru_3[2]).split(&apos;=&apos;)[0]) == 1313224001</span><br><span class="line">a = &apos;=ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz&apos;</span><br><span class="line">for (var i = a.length - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">      for (var j = a.length - 1; j &gt;= 0; j--) &#123;</span><br><span class="line">            if(toHex(b2c(a[i]+a[j]).split(&apos;=&apos;)[0]) == 1313224001)&#123;</span><br><span class="line">                  console.log(a[i]+a[j]);</span><br><span class="line">            &#125;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br><span class="line">for (var i = a.length - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">      for (var j = a.length - 1; j &gt;= 0; j--) &#123;</span><br><span class="line">            if(toHex(b2c(a[i]+a[j]).split(&apos;=&apos;)[0]) == 1330469185)&#123;</span><br><span class="line">                  console.log(a[i]+a[j]);</span><br><span class="line">            &#125;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br><span class="line">var toHex = function (stri) &#123;</span><br><span class="line">    var str = &apos;0x&apos;;</span><br><span class="line">    for (var i = 0; i &lt; stri.length; i++) &#123;</span><br><span class="line">        str += stri.charCodeAt(i).toString(16);</span><br><span class="line">    &#125;</span><br><span class="line">    return str;</span><br><span class="line">&#125;;</span><br><span class="line">b2c = function (_0x3f9bc5) &#123;</span><br><span class="line">    var _0x3c3bd8 = &apos;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&apos;;</span><br><span class="line">    var _0x4dc510 = [];</span><br><span class="line">    var _0x4a199f = Math.floor(_0x3f9bc5.length / 5);</span><br><span class="line">    var _0x4ee491 = _0x3f9bc5.length % 5;</span><br><span class="line">    if (_0x4ee491 != 0) &#123;</span><br><span class="line">        for (var _0x1e1753 = 0; _0x1e1753 &lt; 5 - _0x4ee491; _0x1e1753++) &#123;</span><br><span class="line">            _0x3f9bc5 += &apos;&apos;;</span><br><span class="line">        &#125;</span><br><span class="line">        _0x4a199f += 1;</span><br><span class="line">    &#125;</span><br><span class="line">    for (_0x1e1753 = 0; _0x1e1753 &lt; _0x4a199f; _0x1e1753++) &#123;</span><br><span class="line">        _0x4dc510.push(_0x3c3bd8.charAt(_0x3f9bc5.charCodeAt(_0x1e1753 * 5) &gt;&gt; 3));</span><br><span class="line">        _0x4dc510.push(_0x3c3bd8.charAt((_0x3f9bc5.charCodeAt(_0x1e1753 * 5) &amp; 7) &lt;&lt; 2 | _0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 1) &gt;&gt; 6));</span><br><span class="line">        _0x4dc510.push(_0x3c3bd8.charAt((_0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 1) &amp; 63) &gt;&gt; 1));</span><br><span class="line">        _0x4dc510.push(_0x3c3bd8.charAt((_0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 1) &amp; 1) &lt;&lt; 4 | _0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 2) &gt;&gt; 4));</span><br><span class="line">        _0x4dc510.push(_0x3c3bd8.charAt((_0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 2) &amp; 15) &lt;&lt; 1 | _0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 3) &gt;&gt; 7));</span><br><span class="line">        _0x4dc510.push(_0x3c3bd8.charAt((_0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 3) &amp; 127) &gt;&gt; 2));</span><br><span class="line">        _0x4dc510.push(_0x3c3bd8.charAt((_0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 3) &amp; 3) &lt;&lt; 3 | _0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 4) &gt;&gt; 5));</span><br><span class="line">        _0x4dc510.push(_0x3c3bd8.charAt(_0x3f9bc5.charCodeAt(_0x1e1753 * 5 + 4) &amp; 31));</span><br><span class="line">    &#125;</span><br><span class="line">    var _0x545c12 = 0;</span><br><span class="line">    if (_0x4ee491 == 1)</span><br><span class="line">        _0x545c12 = 6;</span><br><span class="line">    else if (_0x4ee491 == 2)</span><br><span class="line">        _0x545c12 = 4;</span><br><span class="line">    else if (_0x4ee491 == 3)</span><br><span class="line">        _0x545c12 = 3;</span><br><span class="line">    else if (_0x4ee491 == 4)</span><br><span class="line">        _0x545c12 = 1;</span><br><span class="line">    for (_0x1e1753 = 0; _0x1e1753 &lt; _0x545c12; _0x1e1753++)</span><br><span class="line">        _0x4dc510[&apos;pop&apos;]();</span><br><span class="line">    for (_0x1e1753 = 0; _0x1e1753 &lt; _0x545c12; _0x1e1753++)</span><br><span class="line">        _0x4dc510.push(&apos;=&apos;);</span><br><span class="line">    return _0x4dc510.join(&apos;&apos;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">n = f * e * shuru_3[0].length; //f=70341426;e=1266420339;</span><br><span class="line">m = toHex(shuru_3[4].substr(0, 4)) - 1218466658 == n % l; //l=798707826;m=1</span><br><span class="line">if (!m || repeat(shuru_3[4].substr(5, 1), 2) == shuru_3[4].substr(-5, 4) || (shuru_3[4].substr(-2, 1) - shuru_3[4].substr(4, 1)) != 1) &#123;</span><br><span class="line">    return ![];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>存在两个未知变量，输入第一部分长度和输入第五部分前四位，不多说</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">var toHex = function (stri) &#123;</span><br><span class="line">    var str = &apos;0x&apos;;</span><br><span class="line">    for (var i = 0; i &lt; stri.length; i++) &#123;</span><br><span class="line">        str += stri.charCodeAt(i).toString(16);</span><br><span class="line">    &#125;</span><br><span class="line">    return str;</span><br><span class="line">&#125;;</span><br><span class="line">a = &apos;=ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz&apos;</span><br><span class="line">for (var i = a.length - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">      for (var j = a.length - 1; j &gt;= 0; j--) &#123;</span><br><span class="line">            for (var k = a.length - 1; k &gt;= 0; k--) &#123;</span><br><span class="line">                  for (var q = a.length - 1; q &gt;= 0; q--) &#123;</span><br><span class="line">                        for (var n = 10 - 1; n &gt;= 0; n--) &#123;</span><br><span class="line">                              if (toHex(a[i]+a[j]+a[k]+a[q]) - 1218466658 == (70341426 * 1266420339 * n) % 798707826) &#123;</span><br><span class="line">                                    console.log(a[i]+a[j]+a[k]+a[q]);</span><br><span class="line">                                    console.log(n);</span><br><span class="line">                              &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        </span><br><span class="line">                  </span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>拿到输入第五部分前四位h4rd和输入第一部分长度7</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">o = toHex(shuru_3[4].substr(6, 2)).substr(2) == shuru_3[4].substr(6, 1).charCodeAt() * shuru_3[4].length * 5;</span><br><span class="line">return o &amp;&amp; shuru_3[4].substr(4, 1) == 2 &amp;&amp; shuru_3[4].substr(6, 2) == repeat(shuru_3[4].substr(7, 1), 2);</span><br></pre></td></tr></table></figure>
+<p>得到第五部分第5位为2；return需要为1 ==&gt; o为1，两个变量，跑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var toHex = function (stri) &#123;</span><br><span class="line">    var str = &apos;0x&apos;;</span><br><span class="line">    for (var i = 0; i &lt; stri.length; i++) &#123;</span><br><span class="line">        str += stri.charCodeAt(i).toString(16);</span><br><span class="line">    &#125;</span><br><span class="line">    return str;</span><br><span class="line">&#125;;</span><br><span class="line">a = &apos;=ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz&#123;&#125;&apos;</span><br><span class="line">for (var i = a.length - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">            for (var n = 20 - 1; n &gt;= 0; n--) &#123;</span><br><span class="line">                  if(toHex(a[i]+a[i]).substr(2) == a[i].charCodeAt() * n * 5)&#123;</span><br><span class="line">                        console.log(a[i]+a[i]);</span><br><span class="line">                        console.log(n);</span><br><span class="line">                  &#125;</span><br><span class="line">            &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>得到第五部分长度13和第五部分7、8位为ee</p>
+<p>至此，flag雏形为hctf{<strong>_rev3rse_iz_s0_h4rd2<em>ee*</em></strong>}，*为未知</p>
+<p>本地条件差不多用光了，用官方提示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">flag.substr(-5,3)==&quot;333&quot;</span><br><span class="line">flag.substr(-8,1)==&quot;333&quot;</span><br><span class="line">        if (!m || repeat(shuru_3[4].substr(5, 1), 2) == shuru_3[4].substr(-5, 4) || (shuru_3[4].substr(-2, 1) - shuru_3[4].substr(4, 1)) != 1) &#123;</span><br><span class="line">            return ![];</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>得到hctf{**_rev3rse_iz_s0_h4rd23ee3333}</p>
+<p>还差两位，根据提示用sha256爆破，首先，由</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var res = (toHex(shuru_3[0].substr(-2, 2)) ^ toHex(shuru_3[0].substr(4, 1))) % shuru_3[0].length == 5;</span><br><span class="line">if (!res) &#123;</span><br><span class="line">    return ![];</span><br><span class="line">&#125;</span><br><span class="line">前面拿到shuru_3[0].length == 7</span><br></pre></td></tr></table></figure>
+<p>根据条件跑出最后两位的所有可能</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var toHex = function (stri) &#123;</span><br><span class="line">    var str = &apos;0x&apos;;</span><br><span class="line">    for (var i = 0; i &lt; stri.length; i++) &#123;</span><br><span class="line">        str += stri.charCodeAt(i).toString(16);</span><br><span class="line">    &#125;</span><br><span class="line">    return str;</span><br><span class="line">&#125;;</span><br><span class="line">a = &apos;=ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz&#123;&#125;&apos;</span><br><span class="line">for (var i = a.length - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">      for (var j = a.length - 1; j &gt;= 0; j--) &#123;</span><br><span class="line">                  if((toHex(a[i]+a[j]) ^ toHex(&apos;&#123;&apos;)) % 7 == 5)&#123;</span><br><span class="line">                        console.log(a[i]+a[j]);</span><br><span class="line">                  &#125;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后对所有可能的sha256与预期验证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=&apos;http://www.bichlmeier.info/sha256.js&apos;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">//console.log(sha256_digest(&quot;message digest&quot;));</span><br><span class="line">a=[&apos;&#125;y&apos;,&apos;&#125;r&apos;,&apos;&#125;l&apos;,&apos;&#125;k&apos;,&apos;&#125;e&apos;,&apos;&#125;4&apos;,&apos;&#125;3&apos;,&apos;&#125;W&apos;,&apos;&#125;H&apos;,&apos;&#125;A&apos;,&apos;&#123;x&apos;,&apos;&#123;q&apos;,&apos;&#123;j&apos;,&apos;&#123;d&apos;,&apos;&#123;c&apos;,&apos;&#123;9&apos;,&apos;&#123;2&apos;,&apos;&#123;V&apos;,&apos;&#123;O&apos;,&apos;z&#123;&apos;,&apos;zu&apos;,&apos;zn&apos;,&apos;zg&apos;,&apos;z6&apos;,&apos;zX&apos;,&apos;zQ&apos;,&apos;zJ&apos;,&apos;zD&apos;,&apos;zC&apos;,&apos;z=&apos;,&apos;yp&apos;,&apos;yi&apos;,&apos;yb&apos;,&apos;y8&apos;,&apos;y1&apos;,&apos;yU&apos;,&apos;yN&apos;,&apos;yG&apos;,&apos;xz&apos;,&apos;xt&apos;,&apos;xs&apos;,&apos;xm&apos;,&apos;xf&apos;,&apos;x5&apos;,&apos;xP&apos;,&apos;xI&apos;,&apos;xB&apos;,&apos;ww&apos;,&apos;wh&apos;,&apos;wa&apos;,&apos;w0&apos;,&apos;wZ&apos;,&apos;wT&apos;,&apos;wS&apos;,&apos;wM&apos;,&apos;wF&apos;,&apos;vy&apos;,&apos;vr&apos;,&apos;vl&apos;,&apos;vk&apos;,&apos;ve&apos;,&apos;v4&apos;,&apos;v3&apos;,&apos;vW&apos;,&apos;vH&apos;,&apos;vA&apos;,&apos;u&#125;&apos;,&apos;uv&apos;,&apos;uo&apos;,&apos;u7&apos;,&apos;uY&apos;,&apos;uR&apos;,&apos;uL&apos;,&apos;uK&apos;,&apos;uE&apos;,&apos;tx&apos;,&apos;tq&apos;,&apos;tj&apos;,&apos;td&apos;,&apos;tc&apos;,&apos;t9&apos;,&apos;t2&apos;,&apos;tV&apos;,&apos;tO&apos;,&apos;s&#123;&apos;,&apos;su&apos;,&apos;sn&apos;,&apos;sg&apos;,&apos;s6&apos;,&apos;sX&apos;,&apos;sQ&apos;,&apos;sJ&apos;,&apos;sD&apos;,&apos;sC&apos;,&apos;s=&apos;,&apos;rp&apos;,&apos;ri&apos;,&apos;rb&apos;,&apos;r8&apos;,&apos;r1&apos;,&apos;rU&apos;,&apos;rN&apos;,&apos;rG&apos;,&apos;qz&apos;,&apos;qt&apos;,&apos;qs&apos;,&apos;qm&apos;,&apos;qf&apos;,&apos;q5&apos;,&apos;qP&apos;,&apos;qI&apos;,&apos;qB&apos;,&apos;pw&apos;,&apos;ph&apos;,&apos;pa&apos;,&apos;p0&apos;,&apos;pZ&apos;,&apos;pT&apos;,&apos;pS&apos;,&apos;pM&apos;,&apos;pF&apos;,&apos;oy&apos;,&apos;or&apos;,&apos;ol&apos;,&apos;ok&apos;,&apos;oe&apos;,&apos;o4&apos;,&apos;o3&apos;,&apos;oW&apos;,&apos;oH&apos;,&apos;oA&apos;,&apos;n&#125;&apos;,&apos;nv&apos;,&apos;no&apos;,&apos;n7&apos;,&apos;nY&apos;,&apos;nR&apos;,&apos;nL&apos;,&apos;nK&apos;,&apos;nE&apos;,&apos;mx&apos;,&apos;mq&apos;,&apos;mj&apos;,&apos;md&apos;,&apos;mc&apos;,&apos;m9&apos;,&apos;m2&apos;,&apos;mV&apos;,&apos;mO&apos;,&apos;l&#123;&apos;,&apos;lu&apos;,&apos;ln&apos;,&apos;lg&apos;,&apos;l6&apos;,&apos;lX&apos;,&apos;lQ&apos;,&apos;lJ&apos;,&apos;lD&apos;,&apos;lC&apos;,&apos;l=&apos;,&apos;kp&apos;,&apos;ki&apos;,&apos;kb&apos;,&apos;k8&apos;,&apos;k1&apos;,&apos;kU&apos;,&apos;kN&apos;,&apos;kG&apos;,&apos;jz&apos;,&apos;jt&apos;,&apos;js&apos;,&apos;jm&apos;,&apos;jf&apos;,&apos;j5&apos;,&apos;jP&apos;,&apos;jI&apos;,&apos;jB&apos;,&apos;iw&apos;,&apos;ih&apos;,&apos;ia&apos;,&apos;i0&apos;,&apos;iZ&apos;,&apos;iT&apos;,&apos;iS&apos;,&apos;iM&apos;,&apos;iF&apos;,&apos;hy&apos;,&apos;hr&apos;,&apos;hl&apos;,&apos;hk&apos;,&apos;he&apos;,&apos;h4&apos;,&apos;h3&apos;,&apos;hW&apos;,&apos;hH&apos;,&apos;hA&apos;,&apos;g&#125;&apos;,&apos;gv&apos;,&apos;go&apos;,&apos;g7&apos;,&apos;gY&apos;,&apos;gR&apos;,&apos;gL&apos;,&apos;gK&apos;,&apos;gE&apos;,&apos;fx&apos;,&apos;fq&apos;,&apos;fj&apos;,&apos;fd&apos;,&apos;fc&apos;,&apos;f9&apos;,&apos;f2&apos;,&apos;fV&apos;,&apos;fO&apos;,&apos;e&#123;&apos;,&apos;eu&apos;,&apos;en&apos;,&apos;eg&apos;,&apos;e6&apos;,&apos;eX&apos;,&apos;eQ&apos;,&apos;eJ&apos;,&apos;eD&apos;,&apos;eC&apos;,&apos;e=&apos;,&apos;dp&apos;,&apos;di&apos;,&apos;db&apos;,&apos;d8&apos;,&apos;d1&apos;,&apos;dU&apos;,&apos;dN&apos;,&apos;dG&apos;,&apos;cz&apos;,&apos;ct&apos;,&apos;cs&apos;,&apos;cm&apos;,&apos;cf&apos;,&apos;c5&apos;,&apos;cP&apos;,&apos;cI&apos;,&apos;cB&apos;,&apos;bw&apos;,&apos;bh&apos;,&apos;ba&apos;,&apos;b0&apos;,&apos;bZ&apos;,&apos;bT&apos;,&apos;bS&apos;,&apos;bM&apos;,&apos;bF&apos;,&apos;ay&apos;,&apos;ar&apos;,&apos;al&apos;,&apos;ak&apos;,&apos;ae&apos;,&apos;a4&apos;,&apos;a3&apos;,&apos;aW&apos;,&apos;aH&apos;,&apos;aA&apos;,&apos;0y&apos;,&apos;0r&apos;,&apos;0l&apos;,&apos;0k&apos;,&apos;0e&apos;,&apos;04&apos;,&apos;03&apos;,&apos;0W&apos;,&apos;0H&apos;,&apos;0A&apos;,&apos;9z&apos;,&apos;9t&apos;,&apos;9s&apos;,&apos;9m&apos;,&apos;9f&apos;,&apos;95&apos;,&apos;9P&apos;,&apos;9I&apos;,&apos;9B&apos;,&apos;8w&apos;,&apos;8h&apos;,&apos;8a&apos;,&apos;80&apos;,&apos;8Z&apos;,&apos;8T&apos;,&apos;8S&apos;,&apos;8M&apos;,&apos;8F&apos;,&apos;7y&apos;,&apos;7r&apos;,&apos;7l&apos;,&apos;7k&apos;,&apos;7e&apos;,&apos;74&apos;,&apos;73&apos;,&apos;7W&apos;,&apos;7H&apos;,&apos;7A&apos;,&apos;6&#125;&apos;,&apos;6v&apos;,&apos;6o&apos;,&apos;67&apos;,&apos;6Y&apos;,&apos;6R&apos;,&apos;6L&apos;,&apos;6K&apos;,&apos;6E&apos;,&apos;5x&apos;,&apos;5q&apos;,&apos;5j&apos;,&apos;5d&apos;,&apos;5c&apos;,&apos;59&apos;,&apos;52&apos;,&apos;5V&apos;,&apos;5O&apos;,&apos;4&#123;&apos;,&apos;4u&apos;,&apos;4n&apos;,&apos;4g&apos;,&apos;46&apos;,&apos;4X&apos;,&apos;4Q&apos;,&apos;4J&apos;,&apos;4D&apos;,&apos;4C&apos;,&apos;4=&apos;,&apos;3p&apos;,&apos;3i&apos;,&apos;3b&apos;,&apos;38&apos;,&apos;31&apos;,&apos;3U&apos;,&apos;3N&apos;,&apos;3G&apos;,&apos;2z&apos;,&apos;2t&apos;,&apos;2s&apos;,&apos;2m&apos;,&apos;2f&apos;,&apos;25&apos;,&apos;2P&apos;,&apos;2I&apos;,&apos;2B&apos;,&apos;1w&apos;,&apos;1h&apos;,&apos;1a&apos;,&apos;10&apos;,&apos;1Z&apos;,&apos;1T&apos;,&apos;1S&apos;,&apos;1M&apos;,&apos;1F&apos;,&apos;Zy&apos;,&apos;Zr&apos;,&apos;Zl&apos;,&apos;Zk&apos;,&apos;Ze&apos;,&apos;Z4&apos;,&apos;Z3&apos;,&apos;ZW&apos;,&apos;ZH&apos;,&apos;ZA&apos;,&apos;Y&#125;&apos;,&apos;Yv&apos;,&apos;Yo&apos;,&apos;Y7&apos;,&apos;YY&apos;,&apos;YR&apos;,&apos;YL&apos;,&apos;YK&apos;,&apos;YE&apos;,&apos;Xx&apos;,&apos;Xq&apos;,&apos;Xj&apos;,&apos;Xd&apos;,&apos;Xc&apos;,&apos;X9&apos;,&apos;X2&apos;,&apos;XV&apos;,&apos;XO&apos;,&apos;W&#123;&apos;,&apos;Wu&apos;,&apos;Wn&apos;,&apos;Wg&apos;,&apos;W6&apos;,&apos;WX&apos;,&apos;WQ&apos;,&apos;WJ&apos;,&apos;WD&apos;,&apos;WC&apos;,&apos;W=&apos;,&apos;Vp&apos;,&apos;Vi&apos;,&apos;Vb&apos;,&apos;V8&apos;,&apos;V1&apos;,&apos;VU&apos;,&apos;VN&apos;,&apos;VG&apos;,&apos;Uz&apos;,&apos;Ut&apos;,&apos;Us&apos;,&apos;Um&apos;,&apos;Uf&apos;,&apos;U5&apos;,&apos;UP&apos;,&apos;UI&apos;,&apos;UB&apos;,&apos;Tw&apos;,&apos;Th&apos;,&apos;Ta&apos;,&apos;T0&apos;,&apos;TZ&apos;,&apos;TT&apos;,&apos;TS&apos;,&apos;TM&apos;,&apos;TF&apos;,&apos;Sy&apos;,&apos;Sr&apos;,&apos;Sl&apos;,&apos;Sk&apos;,&apos;Se&apos;,&apos;S4&apos;,&apos;S3&apos;,&apos;SW&apos;,&apos;SH&apos;,&apos;SA&apos;,&apos;R&#125;&apos;,&apos;Rv&apos;,&apos;Ro&apos;,&apos;R7&apos;,&apos;RY&apos;,&apos;RR&apos;,&apos;RL&apos;,&apos;RK&apos;,&apos;RE&apos;,&apos;Qx&apos;,&apos;Qq&apos;,&apos;Qj&apos;,&apos;Qd&apos;,&apos;Qc&apos;,&apos;Q9&apos;,&apos;Q2&apos;,&apos;QV&apos;,&apos;QO&apos;,&apos;P&#123;&apos;,&apos;Pu&apos;,&apos;Pn&apos;,&apos;Pg&apos;,&apos;P6&apos;,&apos;PX&apos;,&apos;PQ&apos;,&apos;PJ&apos;,&apos;PD&apos;,&apos;PC&apos;,&apos;P=&apos;,&apos;Op&apos;,&apos;Oi&apos;,&apos;Ob&apos;,&apos;O8&apos;,&apos;O1&apos;,&apos;OU&apos;,&apos;ON&apos;,&apos;OG&apos;,&apos;Nz&apos;,&apos;Nt&apos;,&apos;Ns&apos;,&apos;Nm&apos;,&apos;Nf&apos;,&apos;N5&apos;,&apos;NP&apos;,&apos;NI&apos;,&apos;NB&apos;,&apos;Mw&apos;,&apos;Mh&apos;,&apos;Ma&apos;,&apos;M0&apos;,&apos;MZ&apos;,&apos;MT&apos;,&apos;MS&apos;,&apos;MM&apos;,&apos;MF&apos;,&apos;Ly&apos;,&apos;Lr&apos;,&apos;Ll&apos;,&apos;Lk&apos;,&apos;Le&apos;,&apos;L4&apos;,&apos;L3&apos;,&apos;LW&apos;,&apos;LH&apos;,&apos;LA&apos;,&apos;K&#125;&apos;,&apos;Kv&apos;,&apos;Ko&apos;,&apos;K7&apos;,&apos;KY&apos;,&apos;KR&apos;,&apos;KL&apos;,&apos;KK&apos;,&apos;KE&apos;,&apos;Jx&apos;,&apos;Jq&apos;,&apos;Jj&apos;,&apos;Jd&apos;,&apos;Jc&apos;,&apos;J9&apos;,&apos;J2&apos;,&apos;JV&apos;,&apos;JO&apos;,&apos;I&#123;&apos;,&apos;Iu&apos;,&apos;In&apos;,&apos;Ig&apos;,&apos;I6&apos;,&apos;IX&apos;,&apos;IQ&apos;,&apos;IJ&apos;,&apos;ID&apos;,&apos;IC&apos;,&apos;I=&apos;,&apos;Hp&apos;,&apos;Hi&apos;,&apos;Hb&apos;,&apos;H8&apos;,&apos;H1&apos;,&apos;HU&apos;,&apos;HN&apos;,&apos;HG&apos;,&apos;Gz&apos;,&apos;Gt&apos;,&apos;Gs&apos;,&apos;Gm&apos;,&apos;Gf&apos;,&apos;G5&apos;,&apos;GP&apos;,&apos;GI&apos;,&apos;GB&apos;,&apos;Fw&apos;,&apos;Fh&apos;,&apos;Fa&apos;,&apos;F0&apos;,&apos;FZ&apos;,&apos;FT&apos;,&apos;FS&apos;,&apos;FM&apos;,&apos;FF&apos;,&apos;Ey&apos;,&apos;Er&apos;,&apos;El&apos;,&apos;Ek&apos;,&apos;Ee&apos;,&apos;E4&apos;,&apos;E3&apos;,&apos;EW&apos;,&apos;EH&apos;,&apos;EA&apos;,&apos;D&#125;&apos;,&apos;Dv&apos;,&apos;Do&apos;,&apos;D7&apos;,&apos;DY&apos;,&apos;DR&apos;,&apos;DL&apos;,&apos;DK&apos;,&apos;DE&apos;,&apos;Cx&apos;,&apos;Cq&apos;,&apos;Cj&apos;,&apos;Cd&apos;,&apos;Cc&apos;,&apos;C9&apos;,&apos;C2&apos;,&apos;CV&apos;,&apos;CO&apos;,&apos;B&#123;&apos;,&apos;Bu&apos;,&apos;Bn&apos;,&apos;Bg&apos;,&apos;B6&apos;,&apos;BX&apos;,&apos;BQ&apos;,&apos;BJ&apos;,&apos;BD&apos;,&apos;BC&apos;,&apos;B=&apos;,&apos;Ap&apos;,&apos;Ai&apos;,&apos;Ab&apos;,&apos;A8&apos;,&apos;A1&apos;,&apos;AU&apos;,&apos;AN&apos;,&apos;AG&apos;,&apos;=&#125;&apos;,&apos;=v&apos;,&apos;=o&apos;,&apos;=7&apos;,&apos;=Y&apos;,&apos;=R&apos;,&apos;=L&apos;,&apos;=K&apos;,&apos;=E&apos;];</span><br><span class="line">first = &apos;hctf&#123;&apos;;</span><br><span class="line">last = &apos;_rev3rse_iz_s0_h4rd23ee3333&#125;&apos;;</span><br><span class="line">for (var i = a.length - 1; i &gt;= 0; i--) &#123;</span><br><span class="line">	if((sha256_digest(first+a[i]+last))==&quot;d3f154b641251e319855a73b010309a168a12927f3873c97d2e5163ea5cbb443&quot;)&#123;</span><br><span class="line">		console.log(first+a[i]+last);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>拿到flag ==&gt; hctf{j5_rev3rse_iz_s0_h4rd23ee3333}</p>
+<p>参考链接：<br><a href="http://www.freebuf.com/articles/web/97945.html" target="_blank" rel="noopener">http://www.freebuf.com/articles/web/97945.html</a><br>          <a href="https://github.com/javascript-obfuscator/javascript-obfuscator" target="_blank" rel="noopener">https://github.com/javascript-obfuscator/javascript-obfuscator</a></p>
+  
+	</div>
+
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/前端安全/">前端安全</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/混淆/">混淆</a><a href="/tags/JS/">JS</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://michaelwayneliu.github.io/2018/01/13/一例js混淆分析/" data-title="一例js混淆分析 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2018/01/13/强大的pyc/"  title="强大的pyc">
+ <strong>下一篇：</strong><br/> 
+ <span>强大的pyc
+</span>
+</a>
+</div>
+
+</nav>
+
+
+<!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zMjUxMS85MDcy">
+<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+</script>
+<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+
+
+	
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#拿到代码找思路"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x62FF;&#x5230;&#x4EE3;&#x7801;&#x627E;&#x601D;&#x8DEF;" class="headerlink" title="&#x62FF;&#x5230;&#x4EE3;&#x7801;&#x627E;&#x601D;&#x8DEF;"></a>&#x62FF;&#x5230;&#x4EE3;&#x7801;&#x627E;&#x601D;&#x8DEF;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分析语法逆向"><span class="toc-number">2.</span> <span class="toc-text"><a href="#&#x5206;&#x6790;&#x8BED;&#x6CD5;&#x9006;&#x5411;" class="headerlink" title="&#x5206;&#x6790;&#x8BED;&#x6CD5;&#x9006;&#x5411;"></a>&#x5206;&#x6790;&#x8BED;&#x6CD5;&#x9006;&#x5411;</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/PHP/" title="PHP">PHP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/前端安全/" title="前端安全">前端安全<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/博客/" title="博客">博客<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/后端安全/" title="后端安全">后端安全<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/运维/" title="运维">运维<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/JSONP/" title="JSONP">JSONP<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XSS/" title="XSS">XSS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/反弹shell/" title="反弹shell">反弹shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/序列化/" title="序列化">序列化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HTTPS/" title="HTTPS">HTTPS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/错误/" title="错误">错误<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/php/" title="php">php<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客迁移/" title="博客迁移">博客迁移<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/jacman主题配置/" title="jacman主题配置">jacman主题配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/混淆/" title="混淆">混淆<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JS/" title="JS">JS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/资源监控/" title="资源监控">资源监控<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/服务器/" title="服务器">服务器<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向/" title="逆向">逆向<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pyc/" title="pyc">pyc<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blackwolfsec.cc" target="_blank" title="blackwolf">blackwolf</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=2639885925&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m MS in SCU. <br/>
+			Just have a little faith.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/杀手莱昂的美丽人生" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="MS">MS</a>
+		
+		
+		</p>
+</div>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+      Total visits: <span id="busuanzi_value_site_pv"></span>
+</span>
+<span id="busuanzi_container_site_uv">
+      You are Visiter No.<span id="busuanzi_value_site_uv"></span>
+</span>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'msarehere';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255712369'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255712369' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  </body>
+</html>

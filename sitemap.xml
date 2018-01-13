@@ -2,9 +2,44 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://michaelwayneliu.github.io/2018/01/13/%E4%B8%80%E4%BE%8Bjs%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/</loc>
+    
+    <lastmod>2018-01-13T02:48:53.454Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://michaelwayneliu.github.io/2018/01/13/%E5%BC%BA%E5%A4%A7%E7%9A%84pyc/</loc>
+    
+    <lastmod>2018-01-13T02:43:09.349Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://michaelwayneliu.github.io/2018/01/13/%E5%AE%9E%E6%97%B6%E7%9B%91%E8%A7%86%E6%9C%8D%E5%8A%A1%E8%B5%84%E6%BA%90%E5%8D%A0%E7%94%A8and%E6%8A%A5%E8%AD%A6/</loc>
+    
+    <lastmod>2018-01-13T02:33:47.034Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://michaelwayneliu.github.io/2018/01/13/opcache%E9%82%A3%E4%BA%9B%E4%BA%8B/</loc>
+    
+    <lastmod>2018-01-13T02:07:44.545Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://michaelwayneliu.github.io/2018/01/13/burp%E9%94%99%E8%AF%AF%E8%A7%A3%E5%86%B3/</loc>
+    
+    <lastmod>2018-01-13T01:47:50.331Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://michaelwayneliu.github.io/2018/01/12/service-worker-xss%E8%BF%9B%E5%8C%96/</loc>
     
-    <lastmod>2018-01-12T14:42:10.851Z</lastmod>
+    <lastmod>2018-01-12T14:58:42.454Z</lastmod>
     
   </url>
   
@@ -19,6 +54,13 @@
     <loc>https://michaelwayneliu.github.io/2017/12/21/SOME%E6%94%BB%E5%87%BB/</loc>
     
     <lastmod>2017-12-21T11:18:32.638Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://michaelwayneliu.github.io/%E5%BC%BA%E5%A4%A7%E7%9A%84pyc.html</loc>
+    
+    <lastmod>2017-11-22T03:09:26.981Z</lastmod>
     
   </url>
   

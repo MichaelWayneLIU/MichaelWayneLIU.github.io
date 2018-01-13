@@ -1,0 +1,750 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>实时监视服务资源占用and报警 | MSAREHERE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="MS">
+    
+
+    
+    <meta name="description" content="服务器莫名宕机，没有检查到原因，怀疑某进程占用资源过高导致。">
+<meta name="keywords" content="资源监控,服务器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实时监视服务资源占用and报警">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2018/01/13/实时监视服务资源占用and报警/index.html">
+<meta property="og:site_name" content="MSAREHERE">
+<meta property="og:description" content="服务器莫名宕机，没有检查到原因，怀疑某进程占用资源过高导致。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-13T02:33:47.034Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实时监视服务资源占用and报警">
+<meta name="twitter:description" content="服务器莫名宕机，没有检查到原因，怀疑某进程占用资源过高导致。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="MSAREHERE" title="MSAREHERE"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="MSAREHERE">MSAREHERE</a></h1>
+				<h2 class="blog-motto">Just have a little faith</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页 | Home</a></li>
+					
+						<li><a href="/archives">归档 | Archives</a></li>
+					
+						<li><a href="/categories">分类 | Categories</a></li>
+					
+						<li><a href="/tags">标签 | Tags</a></li>
+					
+						<li><a href="/about">关于 | About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:michaelwayneliu.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/01/13/实时监视服务资源占用and报警/" title="实时监视服务资源占用and报警" itemprop="url">实时监视服务资源占用and报警</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
+		
+  <p class="article-time">
+    <time datetime="2018-01-13T02:19:45.000Z" itemprop="datePublished"> 发表于 2018-01-13</time>
+    <span id="busuanzi_container_page_pv">
+    总阅读<span id="busuanzi_value_page_pv"></span>次
+</span>
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#继续深入"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x7EE7;&#x7EED;&#x6DF1;&#x5165;" class="headerlink" title="&#x7EE7;&#x7EED;&#x6DF1;&#x5165;"></a>&#x7EE7;&#x7EED;&#x6DF1;&#x5165;</span></a></li></ol>
+		
+		</div>
+		
+		<p>服务器莫名宕机，没有检查到原因，怀疑某进程占用资源过高导致。<br><a id="more"></a><br>服务器莫名宕机，没有检查到原因，怀疑某进程占用资源过高导致。</p>
+<p>于是使用top+crontab定时监视资源占用</p>
+<pre><code>TIPS：
+1.crontab执行的shell脚本命令要用绝对路径
+2.单独top命令不会自动退出，shell脚本必须要能够自动退出才会些数据到文件里面，所以一定要先单独测试会自动退出的带参数的top命令才行
+3.内容写入文件是&gt;,追加内容是&gt;&gt;
+</code></pre><p>创建一个toptest.sh脚本，内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">NAME=&quot;/root/top_&quot;$(date +%Y-%m-%d-%H)</span><br><span class="line">/usr/bin/top  -b -d 1 -n 1   &gt;&gt; $NAME.txt</span><br><span class="line">/bin/echo -e  &apos;----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n&apos; &gt;&gt; $NAME.txt</span><br><span class="line">/usr/bin/top  -b -d 1 -n 1   &gt;&gt; $NAME.txt</span><br><span class="line">/bin/echo -e  &apos;----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n----------------------------------------------------------------------------------------------------------------------------------------------------\n&apos; &gt;&gt; $NAME.txt</span><br></pre></td></tr></table></figure>
+<p>表示：每一秒更新一次，一共记录1次 将进程信息写入以日期命名的txt文件中<br>以echo -e写入换行，否则有误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x toptest.sh</span><br></pre></td></tr></table></figure>
+<p>接着</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crontab -e</span><br></pre></td></tr></table></figure>
+<p>写入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*/10 * * * * /bin/bash /root/sh/toptest.sh</span><br></pre></td></tr></table></figure>
+<p>表示每十分钟记录两次top输出</p>
+<p>如果系统再次崩溃或者是某个supervisor监控的进程异常退出，想要实现报警效果呢？使用superlance</p>
+<p><strong>superlance就是基于supervisor的事件机制实现的一系列命令行的工具集，它实现了许多supervisor本身没有实现的实用的进程监控和管理的特性，包括内存监控，http接口监控，邮件和短信通知机制等。同样的，superlance本身也是使用python编写的。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">easy_install superlance</span><br><span class="line">pip install superlance</span><br></pre></td></tr></table></figure>
+<p>superlance是一系列命令行工具的集合，其包括以下这些命令：</p>
+<ul>
+<li>httpok<br>  通过定时对一个HTTP接口进行GET请求，根据请求是否成功来判定一个进程是否处于正常状态，如果不正常则对进程进行重启。</li>
+<li>crashmail<br>当一个进程意外退出时，发送邮件告警。</li>
+<li>memmon<br>当一个进程的内存占用超过了设定阈值时，发送邮件告警。</li>
+<li>crashmailbatch<br>类似于crashmail的告警，但是一段时间内的邮件将会被合成起来发送，以避免邮件轰炸。</li>
+<li>fatalmailbatch<br>当一个进程没有成功启动多次后会进入FATAL状态，此时发送邮件告警。与crashmailbatch一样会进行合成报警。</li>
+<li>crashsms<br>当一个进程意外退出时发送短信告警，这个短信也是通过email网关来发送的。</li>
+</ul>
+<p>superlance是基于supervisor的，所以要利用Supervisord进行进程监控和报警需要利用Supervisord的Event特性，编写一个listener，监控进程状态的改变，然后执行指定的代码。event的发起方是supervisord进程，接收方是一个叫listener的东西。listener和program一样，都是supervisord的子进程。两者的在配置上，很多选项也都一样。</p>
+<pre><code>1.当supervisord启动的时候，如果我们的listener配置为autostart=true的话，listener就会作为supervisor的子进程被启动。
+2.listener被启动之后，会向自己的stdout写一个&quot;READY&quot;的消息,此时父进程也就是supervisord读取到这条消息后，会认为listener处于就绪状态。
+3.listener处于就绪状态后，当supervisord产生的event在listener的配置的可接受的events中时，supervisord就会把该event发送给该listener。  
+4.listener接收到event后，我们就可以根据event的head，body里面的数据，做一系列的处理了。我们根据event的内容，判断，提取，报警等等操作。
+5.该干的活都干完之后，listener需要向自己的stdout写一个消息&quot;RESULT\nOK&quot;，supervisord接受到这条消息后。就知道listener处理event完毕了。
+</code></pre><p>Supervisord支持的Event有：</p>
+<pre><code>PROCESS_STATE 进程状态发生改变
+PROCESS_STATE_STARTING 进程状态从其他状态转换为正在启动(Supervisord的配置项中有startsecs配置项，
+                          是指程序启动时需要程序至少稳定运行x秒才认为程序运行正常，在这x秒中程序状态为正在启动)
+PROCESS_STATE_RUNNING 进程状态由正在启动转换为正在运行
+PROCESS_STATE_BACKOFF 进程状态由正在启动转换为失败
+PROCESS_STATE_STOPPING 进程状态由正在运行转换为正在停止
+PROCESS_STATE_EXITED 进程状态由正在运行转换为退出
+PROCESS_STATE_STOPPED 进程状态由正在停止转换为已经停止(exited和stopped的区别是exited是程序自行退出，而stopped为人为控制其退出)
+PROCESS_STATE_FATAL 进程状态由正在运行转换为失败
+PROCESS_STATE_UNKNOWN 未知的进程状态
+REMOTE_COMMUNICATION 使用Supervisord的RPC接口与Supervisord进行通信
+PROCESS_LOG 进程产生日志输出，包括标准输出和标准错误输出
+PROCESS_LOG_STDOUT 进程产生标准输出
+PROCESS_LOG_STDERR 进程产生标准错误输出
+PROCESS_COMMUNICATION 进程的日志输出包含 和
+PROCESS_COMMUNICATION_STDOUT 进程的标准输出包含 和
+PROCESS_COMMUNICATION_STDERR 进程的标准错误输出包含 和
+SUPERVISOR_STATE_CHANGE_RUNNING Supervisord启动
+SUPERVISOR_STATE_CHANGE_STOPPING Supervisord停止
+TICK_5 每隔5秒触发
+TICK_60 每隔60秒触发
+TICK_3600 每隔3600触发
+PROCESS_GROUP Supervisord的进程组发生变化
+PROCESS_GROUP_ADDED 新增了Supervisord的进程组
+PROCESS_GROUP_REMOVED 删除了Supervisord的进程组
+</code></pre><p>详细的Event特性请参考：<a href="http://supervisord.org/events.html" target="_blank" rel="noopener">http://supervisord.org/events.html</a><br>我们可以利用Supervisord的特性监控进程并报警，如当进程异常退出时报警，或当进程产生错误输出是报警。<br>superlance使用sendmail来发送email，默认安装的话sendmail在ubuntu server已经安装好</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install sendmail</span><br></pre></td></tr></table></figure>
+<p><strong>这个地方有一个大坑，默认的时候crashmail使用的是linux系统的sendmail，发送出去的邮件很容易隐藏自己的信息，所以一般邮件服务商针对这些邮件会报错，大概是DSN, service unavailable， 貌似是你的ip地址和dns反解析不一致导致，所以无法发送邮件。<br>    所以本文采用的实际上是sendemail，一个非常强大的使用perl语言写的支持附件发送等诸多功能的脚本。</strong> </p>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget http://caspian.dotconf.net/menu/Software/SendEmail/sendEmail-v1.56.tar.gz //下载1.56版本</span><br><span class="line">tar -xzvf sendEmail-v1.56.tar.gz //解压后就可以使用了</span><br><span class="line">cd sendEmail-v1.56</span><br><span class="line">mv sendEmail /usr/local/bin/</span><br><span class="line">chmod +x /usr/local/bin/sendEmail</span><br></pre></td></tr></table></figure>
+<p>使用很简单<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/bin/sendEmail 　　　命令主程序</span><br><span class="line">-f yxylinux@163.com  　　　　　发件人邮箱</span><br><span class="line">-s smtp.163.com       　　　　　发件人邮箱的smtp服务器</span><br><span class="line">-u &quot;我是邮件主题&quot;     　　　　　　邮件的标题</span><br><span class="line">-o message-content-type=html   邮件内容的格式,html表示它是html格式</span><br><span class="line">-o message-charset=utf8        邮件内容编码</span><br><span class="line">-xu yxylinux                    发件人邮箱的用户名</span><br><span class="line">-xp 123456               　　发件人邮箱密码</span><br><span class="line">-m &quot;我是邮件内容&quot;        　　邮件的具体内容</span><br></pre></td></tr></table></figure></p>
+<p>-xp 是smtp服务器的授权码。不使用smtp发送的方式也可以，而且秒发，只是qq邮箱会把发送过来的邮件当做垃圾邮件<br>更多姿势参考<a href="http://blog.csdn.net/leshami/article/details/8314570" target="_blank" rel="noopener">这里</a></p>
+<p>在开始编辑supervisor配置文件mail.conf 前，先补点知识，crashmail是一个主管“事件监听器”，用于订阅PROCESS_STATE_EXITED事件。当crashmail 收到该事件并且转换是“意外的”时，crashmail 会将电子邮件通知发送到已配置的地址。<br>尤其<strong>注意</strong>的是</p>
+<pre><code>crashmail不能监视不是supervisord子进程的进程的进程状态。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[program:top]</span><br><span class="line">command=/usr/bin/top  -b</span><br><span class="line">user=root</span><br><span class="line">directory=/opt/</span><br><span class="line">stdout_logfile=/var/log/top/top.log</span><br><span class="line">stderr_logfile=/var/log/top/top.err</span><br><span class="line">stderr_logfile_maxbytes=1MB</span><br><span class="line">stderr_logfile_backups=10</span><br><span class="line">stdout_logfile_maxbytes=1MB</span><br><span class="line">stdout_logfile_backups=10</span><br><span class="line">autostart=true</span><br><span class="line">autorestart=true</span><br><span class="line">startsecs=10</span><br><span class="line"></span><br><span class="line">[eventlistener:crashmail-exited]</span><br><span class="line">command=crashmail -p top -s &quot;/usr/local/bin/sendEmail -f xxx@163.com -t xxx@qq.com -s smtp.163.com  -u &apos;报警&apos; -xu xxx -xp xxx -o message-charset=utf-8 -m&quot; -m xxx@qq.com</span><br><span class="line">#events=PROCESS_STATE_EXITED # 一般只是这一句就好了，测试中发现，下面一坨和这一行的效果是一样一样的，只有exited的时候才会触发</span><br><span class="line">events=PROCESS_STATE_EXITED,PROCESS_STATE_STOPPED,PROCESS_STATE_FATAL,PROCESS_LOG_STDERR</span><br><span class="line">redirect_stderr=false</span><br></pre></td></tr></table></figure>
+<p>首先配置了一个名为top的进程监控项，其内容就是很简单的重复执行top -b，持续地输出当前系统的进程信息。<br>    随后配置了一个名为crashmail的事件监听器，它接受来自supervisor的PROCESS_STATE_EXITED事件，并且会触发crashmail的命令行调用。<br>    而在command参数中-p参数配置了crashmail只会对名为top的监控项作出响应。<br>    在上面的command中最后的-m后面没有东西了，因为crashmail会通过stdin输送给命令，也就是为啥邮件正文中有to 和 from这些本该是邮件header的内容。<br>    具体参考官档：<a href="http://superlance.readthedocs.io/en/latest/crashmail.html" target="_blank" rel="noopener">http://superlance.readthedocs.io/en/latest/crashmail.html</a></p>
+<p>以上间接通过不断运行top并记录实现了服务器资源占用情况的监控，如果服务器崩溃会产生记录并报警。想要测试发送邮件的功能，可以通过shell的ps指令找到top -b 的进程id，使用kill -9的方式强行结束进程</p>
+<h3 id="继续深入"><a href="#继续深入" class="headerlink" title="继续深入"></a>继续深入</h3><p>supervisor的事件机制是一个简单的 Listener/Notification模型, Listener通过标准输入来获取supervisor发来的事件通知, 然后通过标准输出来告诉supervisor事件处理结果。过程中传递的EventNotification 由head和body两部分组成，监听器的处理事件流程为: readline()读取head -&gt; 读取固定长度的data -&gt; 输出状态信息<br>head的结构如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ver:3.0 server:supervisor serial:35 pool:event_listener poolserial:35 eventname:PROCESS_STATE_RUNNING len:91</span><br></pre></td></tr></table></figure></p>
+<pre><code>ver: 版本信息
+serial: supervisor给事件的编号, 第一个事件为1, 之后事件编号递增
+pool：这个是你的listener的pool的名字，一般你的listener只启动一个进程的的话，其实也就没有  
+eventpool: 产生event的event_listener名字
+poolserial: 与serial不同的是, 由于可以有多个eventpool,而且eventpool可以检测的范围事件范围可以不同， 这个poolserial是相对某个eventpool的编号
+eventname: supervisor 标准定义的事件状态
+len: data长度, 此长度十分重要,需要再通过标准输入读入len长度的数据, 某个event_notification才算读取完毕
+</code></pre><p>然后按照head的信息, 读入长度为len的数据, 这个数据就是event的data部分:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">processname:application_demo_03 groupname:application_demo_03 from_state:STARTING pid:81292</span><br></pre></td></tr></table></figure>
+<pre><code>processname: 触发事件的applicaiton名称
+groupname: 触发事件的application的组名称
+from_state: 事件触发状态之前的那个状态
+pid: 进程id
+</code></pre><p>于是有了代码，可以编写自己的接口函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line">#coding:utf-8</span><br><span class="line"> </span><br><span class="line">import sys</span><br><span class="line">import os</span><br><span class="line">import subprocess</span><br><span class="line">#childutils这个模块是supervisor的一个模型，可以方便我们处理event消息。。。当然我们也可以自己按照协议，用任何语言来写listener，只不过用childutils更加简便罢了</span><br><span class="line">from supervisor import childutils</span><br><span class="line">from optparse import OptionParser</span><br><span class="line">import socket</span><br><span class="line">import fcntl</span><br><span class="line">import struct</span><br><span class="line"> </span><br><span class="line">__doc__ = &quot;\033[32m%s,捕获PROCESS_STATE_EXITED事件类型,当异常退出时触发报警\033[0m&quot; % sys.argv[0]</span><br><span class="line"> </span><br><span class="line">def write_stdout(s):</span><br><span class="line">    sys.stdout.write(s)</span><br><span class="line">    sys.stdout.flush()</span><br><span class="line">#定义异常，没啥大用其实</span><br><span class="line">class CallError(Exception):</span><br><span class="line">    def __init__(self,value):</span><br><span class="line">        self.value = value</span><br><span class="line">    def __str__(self):</span><br><span class="line">        return repr(self.value)</span><br><span class="line">#定义处理event的类</span><br><span class="line">class ProcessesMonitor():</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.stdin = sys.stdin</span><br><span class="line">        self.stdout = sys.stdout</span><br><span class="line"> </span><br><span class="line">    def runforever(self):</span><br><span class="line">        #定义一个无限循环，可以循环处理event，当然也可以不用循环，把listener的autorestart#配置为true，处理完一次event就让该listener退出，然后supervisord重启该listener，这样listen#er就可以处理新的event了</span><br><span class="line">        while 1:</span><br><span class="line">            #下面这个东西，是向stdout发送&quot;READY&quot;，然后就阻塞在这里，一直等到有event发过来</span><br><span class="line">            #headers,payload分别是接收到的header和body的内容</span><br><span class="line">            headers, payload = childutils.listener.wait(self.stdin, self.stdout)</span><br><span class="line">            #判断event是否是咱们需要的，不是的话，向stdout写入&quot;RESULT\NOK&quot;，并跳过当前</span><br><span class="line">            #循环的剩余部分</span><br><span class="line">            if not headers[&apos;eventname&apos;] == &apos;PROCESS_STATE_EXITED&apos;:</span><br><span class="line">                childutils.listener.ok(self.stdout)</span><br><span class="line">                continue</span><br><span class="line"> </span><br><span class="line">            pheaders,pdata = childutils.eventdata(payload+&apos;\n&apos;)</span><br><span class="line">            #判读event是否是expected是否是expected的，expected的话为1，否则为0</span><br><span class="line">            #这里的判断是过滤掉expected的event</span><br><span class="line">            if int(pheaders[&apos;expected&apos;]):</span><br><span class="line">                childutils.listener.ok(self.stdout)</span><br><span class="line">                continue</span><br><span class="line"> </span><br><span class="line">            ip = self.get_ip(&apos;eth0&apos;)</span><br><span class="line">            #构造报警信息结构</span><br><span class="line">            msg = &quot;[Host:%s][Process:%s][pid:%s][exited unexpectedly fromstate:%s]&quot; % (ip,pheaders[&apos;processname&apos;],pheaders[&apos;pid&apos;],pheaders[&apos;from_state&apos;])</span><br><span class="line">            #调用报警接口，换成自己的接口</span><br><span class="line">            subprocess.call(&quot;/usr/local/bin/alert.py -m &apos;%s&apos;&quot; % msg,shell=True)</span><br><span class="line">            #stdout写入&quot;RESULT\nOK&quot;，并进入下一次循环</span><br><span class="line">            childutils.listener.ok(self.stdout)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    &apos;&apos;&apos;def check_user(self):</span><br><span class="line">        userName = os.environ[&apos;USER&apos;]</span><br><span class="line">        if userName != &apos;root&apos;:</span><br><span class="line">            try:</span><br><span class="line">                raise MyError(&apos;must be run by root!&apos;)</span><br><span class="line">            except MyError as e:</span><br><span class="line">                write_stderr( &quot;Error occurred,value:%s\n&quot; % e.value)</span><br><span class="line">                sys.exit(255)&apos;&apos;&apos;</span><br><span class="line"> </span><br><span class="line">    def get_ip(self,ifname):</span><br><span class="line">        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)</span><br><span class="line">        inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack(&apos;256s&apos;, ifname[:15]))</span><br><span class="line">        ret = socket.inet_ntoa(inet[20:24])</span><br><span class="line">        return ret</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def main():</span><br><span class="line">    parser = OptionParser()</span><br><span class="line">    if len(sys.argv) == 2:</span><br><span class="line">        if sys.argv[1] == &apos;-h&apos; or sys.argv[1] == &apos;--help&apos;:</span><br><span class="line">            print __doc__</span><br><span class="line">            sys.exit(0)</span><br><span class="line">    #(options, args) = parser.parse_args()</span><br><span class="line">    #下面这个，表示只有supervisord才能调用该listener，否则退出</span><br><span class="line">    if not &apos;SUPERVISOR_SERVER_URL&apos; in os.environ:</span><br><span class="line">        try:</span><br><span class="line">            raise CallError(&quot;%s must be run as a supervisor event&quot; % sys.argv[0])</span><br><span class="line">        except CallError as e:</span><br><span class="line">            write_stderr(&quot;Error occurred,value: %s\n&quot; % e.value)</span><br><span class="line"> </span><br><span class="line">        return</span><br><span class="line"> </span><br><span class="line">    prog = ProcessesMonitor()</span><br><span class="line">    prog.runforever()</span><br><span class="line"> </span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line">#coding=utf-8</span><br><span class="line"># Author zhyaof(mail@zhyaof.net)</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">    Suprevisord Listener example.</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">import sys</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">def write_stdout(s):</span><br><span class="line">    sys.stdout.write(s)</span><br><span class="line">    sys.stdout.flush()</span><br><span class="line"></span><br><span class="line">def write_stderr(s):</span><br><span class="line">    sys.stderr.write(s)</span><br><span class="line">    sys.stderr.flush()</span><br><span class="line"></span><br><span class="line">def baojing(msg=None, data=None):</span><br><span class="line">    if msg == None and data == None:</span><br><span class="line">        return</span><br><span class="line">	# alert</span><br><span class="line"></span><br><span class="line">def parseData(data):</span><br><span class="line">    tmp = data.split(&apos;\n&apos;)</span><br><span class="line">    pheaders = dict([ x.split(&apos;:&apos;) for x in tmp[0].split() ])</span><br><span class="line">    pdata = None</span><br><span class="line">    if len(tmp) &gt; 1:</span><br><span class="line">        pdata = tmp[1]</span><br><span class="line">    return pheaders, pdata</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    #Only supervisord can run this listener, otherwise exit.</span><br><span class="line">    if not &apos;SUPERVISOR_SERVER_URL&apos; in os.environ:</span><br><span class="line">        print &quot;%s must be run as a supervisor listener.&quot; % sys.argv[0]</span><br><span class="line">        return</span><br><span class="line"></span><br><span class="line">    while True:</span><br><span class="line">        #echo &apos;READY&apos; and wait for event for stdin.</span><br><span class="line">        write_stdout(&apos;READY\n&apos;)</span><br><span class="line">        line = sys.stdin.readline()  # read header line from stdin</span><br><span class="line">        headers = dict([ x.split(&apos;:&apos;) for x in line.split() ])</span><br><span class="line">        data = sys.stdin.read(int(headers[&apos;len&apos;])) # read the event payload</span><br><span class="line">        </span><br><span class="line">        if headers[&apos;eventname&apos;] == &apos;PROCESS_STATE_EXITED&apos; or\</span><br><span class="line">           headers[&apos;eventname&apos;] == &apos;PROCESS_STATE_FATAL&apos; or\</span><br><span class="line">           headers[&apos;eventname&apos;] == &apos;PROCESS_STATE_STOPPED&apos;:</span><br><span class="line">            pheaders, pdata = parseData(data)</span><br><span class="line">            from_state = pheaders[&apos;from_state&apos;]</span><br><span class="line">            process_name = pheaders[&apos;processname&apos;]</span><br><span class="line">            if headers[&apos;eventname&apos;] == &apos;PROCESS_STATE_EXITED&apos; and\</span><br><span class="line">                not int(pheaders[&apos;expected&apos;]):</span><br><span class="line">                msg = &apos;进程%s(PID: %s)异常退出，请检查进程状态.&apos;\</span><br><span class="line">                    % (process_name, pheaders[&apos;pid&apos;])</span><br><span class="line">                baojing(msg=msg)</span><br><span class="line">            if headers[&apos;eventname&apos;] == &apos;PROCESS_STATE_FATAL&apos;:</span><br><span class="line">                msg = &apos;进程%s启动失败，请检查进程状态.&apos;\</span><br><span class="line">                    % (process_name)</span><br><span class="line">                baojing(msg=msg)</span><br><span class="line">        elif headers[&apos;eventname&apos;] == &apos;PROCESS_LOG_STDERR&apos;:</span><br><span class="line">            pheaders, pdata = parseData(data)</span><br><span class="line">            process_name = pheaders[&apos;processname&apos;]</span><br><span class="line">            pid = pheaders[&apos;pid&apos;]</span><br><span class="line">            msg = &apos;进程%s(PID: %s)错误输出，请检查进程状态，错误输出信息: %s.&apos; \</span><br><span class="line">                % (process_name, pid, pdata)</span><br><span class="line">            baojing(msg=msg)</span><br><span class="line">        #echo RESULT</span><br><span class="line">        write_stdout(&apos;RESULT 2\nOK&apos;) # transition from READY to ACKNOWLEDGED</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>其中报警函数可以自行拓展，如利用sendmail发邮件报警，利用微信接口实现微信报警或利用短信接口进行短信报警等。<br>本地测试，将报警函数写为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def baojing(msg=None, data=None):</span><br><span class="line">    # if msg == None and data == None:</span><br><span class="line">    #     return</span><br><span class="line">        with open(&quot;/root/test.txt&quot;,&apos;w&apos;)as f:</span><br><span class="line">                f.write(msg)</span><br></pre></td></tr></table></figure></p>
+<p>kill掉某个supervisor子进程，得到test.txt，内容为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">进程top(PID: 19285)异常退出，请检查进程状态.</span><br></pre></td></tr></table></figure>
+<p>参考链接：</p>
+<p><a href="http://blog.csdn.net/baidu_zhongce/article/details/49151385" target="_blank" rel="noopener">http://blog.csdn.net/baidu_zhongce/article/details/49151385</a><br>            <a href="http://talk.withme.me/?p=318" target="_blank" rel="noopener">http://talk.withme.me/?p=318</a><br>            <a href="http://lixcto.blog.51cto.com/4834175/1540169/" target="_blank" rel="noopener">http://lixcto.blog.51cto.com/4834175/1540169/</a></p>
+  
+	</div>
+
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/运维/">运维</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/资源监控/">资源监控</a><a href="/tags/服务器/">服务器</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://michaelwayneliu.github.io/2018/01/13/实时监视服务资源占用and报警/" data-title="实时监视服务资源占用and报警 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/01/13/强大的pyc/" title="强大的pyc">
+  <strong>上一篇：</strong><br/>
+  <span>
+  强大的pyc</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/01/13/opcache那些事/"  title="opcache那些事">
+ <strong>下一篇：</strong><br/> 
+ <span>opcache那些事
+</span>
+</a>
+</div>
+
+</nav>
+
+
+<!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zMjUxMS85MDcy">
+<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+</script>
+<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+
+
+	
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#继续深入"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x7EE7;&#x7EED;&#x6DF1;&#x5165;" class="headerlink" title="&#x7EE7;&#x7EED;&#x6DF1;&#x5165;"></a>&#x7EE7;&#x7EED;&#x6DF1;&#x5165;</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/PHP/" title="PHP">PHP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/前端安全/" title="前端安全">前端安全<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/博客/" title="博客">博客<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/后端安全/" title="后端安全">后端安全<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/运维/" title="运维">运维<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/JSONP/" title="JSONP">JSONP<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XSS/" title="XSS">XSS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/反弹shell/" title="反弹shell">反弹shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/序列化/" title="序列化">序列化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HTTPS/" title="HTTPS">HTTPS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/错误/" title="错误">错误<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/php/" title="php">php<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客迁移/" title="博客迁移">博客迁移<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/jacman主题配置/" title="jacman主题配置">jacman主题配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/混淆/" title="混淆">混淆<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JS/" title="JS">JS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/资源监控/" title="资源监控">资源监控<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/服务器/" title="服务器">服务器<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向/" title="逆向">逆向<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pyc/" title="pyc">pyc<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blackwolfsec.cc" target="_blank" title="blackwolf">blackwolf</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=2639885925&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m MS in SCU. <br/>
+			Just have a little faith.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/杀手莱昂的美丽人生" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="MS">MS</a>
+		
+		
+		</p>
+</div>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+      Total visits: <span id="busuanzi_value_site_pv"></span>
+</span>
+<span id="busuanzi_container_site_uv">
+      You are Visiter No.<span id="busuanzi_value_site_uv"></span>
+</span>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'msarehere';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255712369'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255712369' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  </body>
+</html>

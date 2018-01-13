@@ -1,0 +1,544 @@
+
+  
+    <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>MSAREHERE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="MS">
+    
+
+    
+    <meta name="description" content="遇到问题修改了程序源码，使用celery调用task调了半天，结果发现程序竟然一直没有生效。尝试过使源程序报错，从日志里找到信息，但是程序依然运行良好。 搜了关于celery rabbitmq yara的相关问题，没有找到结果，最后无意中找到了问题的所在，自己还是太嫩。。 pycpyc文件是用来保存python虚拟机编译生成的byte code 的。在python的运行过程中，如果遇到import">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MSAREHERE">
+<meta property="og:url" content="https://michaelwayneliu.github.io/强大的pyc.html">
+<meta property="og:site_name" content="MSAREHERE">
+<meta property="og:description" content="遇到问题修改了程序源码，使用celery调用task调了半天，结果发现程序竟然一直没有生效。尝试过使源程序报错，从日志里找到信息，但是程序依然运行良好。 搜了关于celery rabbitmq yara的相关问题，没有找到结果，最后无意中找到了问题的所在，自己还是太嫩。。 pycpyc文件是用来保存python虚拟机编译生成的byte code 的。在python的运行过程中，如果遇到import">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-11-22T03:09:26.981Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MSAREHERE">
+<meta name="twitter:description" content="遇到问题修改了程序源码，使用celery调用task调了半天，结果发现程序竟然一直没有生效。尝试过使源程序报错，从日志里找到信息，但是程序依然运行良好。 搜了关于celery rabbitmq yara的相关问题，没有找到结果，最后无意中找到了问题的所在，自己还是太嫩。。 pycpyc文件是用来保存python虚拟机编译生成的byte code 的。在python的运行过程中，如果遇到import">
+
+    
+    <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+      <body>
+        <header>
+          
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="MSAREHERE" title="MSAREHERE"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="MSAREHERE">MSAREHERE</a></h1>
+				<h2 class="blog-motto">Just have a little faith</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页 | Home</a></li>
+					
+						<li><a href="/archives">归档 | Archives</a></li>
+					
+						<li><a href="/categories">分类 | Categories</a></li>
+					
+						<li><a href="/tags">标签 | Tags</a></li>
+					
+						<li><a href="/about">关于 | About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:michaelwayneliu.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+        </header>
+        <div id="container">
+          <div id="main" class="page" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/强大的pyc.html" title="" itemprop="url"></a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
+		
+  <p class="article-time">
+    <time datetime="2017-11-22T03:09:26.981Z" itemprop="datePublished"> 发表于 2017-11-22</time>
+    <span id="busuanzi_container_page_pv">
+    总阅读<span id="busuanzi_value_page_pv"></span>次
+</span>
+  </p>
+</header>
+	<div class="article-content">
+		
+		<h3 id="遇到问题"><a href="#遇到问题" class="headerlink" title="遇到问题"></a>遇到问题</h3><p>修改了程序源码，使用celery调用task调了半天，结果发现程序竟然一直没有生效。尝试过使源程序报错，从日志里找到信息，但是程序依然运行良好。</p>
+<p>搜了关于celery rabbitmq yara的相关问题，没有找到结果，最后无意中找到了问题的所在，自己还是太嫩。。</p>
+<h3 id="pyc"><a href="#pyc" class="headerlink" title="pyc"></a>pyc</h3><p>pyc文件是用来保存python虚拟机编译生成的byte code 的。在python的运行过程中，如果遇到import首先在设定好的path中寻找对应的.pyc或者.dll 文件。如果没有这些文件，则编译成对应的PycodeObject并向.pyc文件写入中间结果。也就是在你 import 别的 py 文件时，那个 py 文件会被存一份 pyc 加速下次装载。具体原理大神说的很清楚<a href="https://www.zhihu.com/question/30296617" target="_blank" rel="noopener">https://www.zhihu.com/question/30296617</a></p>
+<h3 id="celery"><a href="#celery" class="headerlink" title="celery"></a>celery</h3><p>命令行执行celery worker -A –loglevel=info时，必须可导入，所以可以为PY模块或包，但需要注意的不管是包还是模块都必须正确指定Celery入口文件(如果为包则默认的入口文件名为celery.py)的绝对导入名称(app/work.app)，Celery通过动态导入获取实例化后的应用，通过实例化时指定的配置以及include来依次导入任务执行文件中的任务指定单元，然后就是等待任务，可以看出Celery是通过相对/绝对导入来查找定义的任务执行单元，<strong>PY导入成功后会生成PYC文件，所以代码修改后一定要先删除PYC文件</strong>。</p>
+<h3 id="排除pyc干扰"><a href="#排除pyc干扰" class="headerlink" title="排除pyc干扰"></a>排除pyc干扰</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo find /project -name &quot;*.pyc&quot; | xargs rm -rf</span><br></pre></td></tr></table></figure>
+<p>在打包时忽略 .pyc 文件或许是个更方便的办法。<br>tar和zip都可以加上 –exclude=*.pyc 参数来排除 pyc 文件</p>
+<h3 id="pyc逆向"><a href="#pyc逆向" class="headerlink" title="pyc逆向"></a>pyc逆向</h3><p>既然遇到了pyc问题，就顺便学学pyc的逆向吧~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[demo.py]</span><br><span class="line">class A:</span><br><span class="line">    pass</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">def Fun():</span><br><span class="line">    pass</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">value = 1</span><br><span class="line">str = “Python”</span><br><span class="line">a = A()</span><br><span class="line">Fun()</span><br></pre></td></tr></table></figure>
+<pre><code>Python在执行demo.py文件时，首先进行编译，编译的结果有字节码(py文件中操作的处理结果)和Python源代码中包含的静态的信息，如字符串常量等。编译的结果存储在Python运行期的一个对象（[PyCodeObject对象](http://svn.python.org/projects/python/branches/release26-maint/Include/code.h)）中，当Python运行结束后，这些信息甚至还会被存储在一种文件（Pyc文件，通过[marshal](http://svn.python.org/projects/python/branches/release26-maint/Python/marshal.c)序列化）中。
+</code></pre><p>所以PyCodeObject就是Python源代码编译之后的关于程序的静态信息的集合</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">PyCodeObject长这样</span><br><span class="line">[compile.h]</span><br><span class="line">/* Bytecode object */</span><br><span class="line">typedef struct &#123;</span><br><span class="line">    PyObject_HEAD</span><br><span class="line">    int co_argcount;        /* #arguments, except *args */</span><br><span class="line">    int co_nlocals;     /* #local variables */</span><br><span class="line">    int co_stacksize;       /* #entries needed for evaluation stack */</span><br><span class="line">    int co_flags;       /* CO_..., see below */</span><br><span class="line">    PyObject *co_code;      /* instruction opcodes */</span><br><span class="line">    PyObject *co_consts;    /* list (constants used) */</span><br><span class="line">    PyObject *co_names;     /* list of strings (names used) */</span><br><span class="line">    PyObject *co_varnames;  /* tuple of strings (local variable names) */</span><br><span class="line">    PyObject *co_freevars;  /* tuple of strings (free variable names) */</span><br><span class="line">    PyObject *co_cellvars;      /* tuple of strings (cell variable names) */</span><br><span class="line">    /* The rest doesn&apos;t count for hash/cmp */</span><br><span class="line">    PyObject *co_filename;  /* string (where it was loaded from) */</span><br><span class="line">    PyObject *co_name;      /* string (name, for reference) */</span><br><span class="line">    int co_firstlineno;     /* first source line number */</span><br><span class="line">    PyObject *co_lnotab;    /* string (encoding addr&lt;-&gt;lineno mapping) */</span><br><span class="line">&#125; PyCodeObject;</span><br></pre></td></tr></table></figure>
+<p>对应一个作用域，会创建一个PyCodeObject与这段Code Block对应。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[CodeObject.py]</span><br><span class="line">class A:</span><br><span class="line">    pass</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">def Fun():</span><br><span class="line">    pass</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">a = A()</span><br><span class="line">Fun()</span><br></pre></td></tr></table></figure></p>
+<p>在Python编译完成后，一共会创建3个PyCodeObject对象，一个是对应CodeObject.py的，一个是对应class A这段Code（作用域），而最后一个是对应def Fun这段Code的。可以通过Pyc文件保存PyCodeObject</p>
+<p>其中co_lnotab记录byte code和source code的对应信息，记录这些信息间的增量值，所以，对应的co_lnotab就应该是：0，1， 6，1， 44，5</p>
+<table>
+<thead>
+<tr>
+<th>Byte code在co_code中的偏移</th>
+<th>.py文件中源代码的行数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2</td>
+</tr>
+<tr>
+<td>50</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+<p>一个pyc文件的构成就像下面的结构一样，一板一眼，按顺序往下代就是，遇到不理解的常量什么的就去查<a href="https://github.com/Python/cpython/blob/2.7/Include/opcode.h" target="_blank" rel="noopener">python源码头文件</a>，对于opcode的意义可以查<a href="https://docs.Python.org/2/library/dis.html" target="_blank" rel="noopener">https://docs.Python.org/2/library/dis.html</a></p>
+<p>Python .pyc file structure代码</p>
+<pre><code>============== &lt;- 文件起始。下面是文件头信息  
+pyc_magic     （=0xD1 0xF2 0x0D 0x0A，4字节，简单校验.pyc的魔数）  
+mtime         （4字节，.pyc对应的源文件的修改时间）  
+============== &lt;- 顶层PyCodeObject起始。下面都属于顶层代码对象  
+TYPE_CODE     （=&apos;c&apos;，1字节，PyCodeObject的类型标识）  
+co_argscount  （4字节，位置参数的个数）  
+co_nlocals    （4字节，局部变量（包括位置参数）的个数）  
+co_stacksize  （4字节，求值栈的最大深度）  
+co_flags      （4字节，用来表示参数中是否有*args或者 **kwargs）  
+co_code       （PyStringObject，Code Block编译所得的字节码）  
+co_consts     （PyTupleObject，常量池）  
+co_names      （PyTupleObject，所有用到的符号的集合）  
+co_varnames   （PyTupleObject，局部变量名集合，在本代码段中赋值，但没有被内层代码引用的变量）  
+co_freevars   （PyTupleObject，自由变量的变量名集合，在本层引用，在外层赋值的变量）  
+co_cellvars   （PyTupleObject，被闭包捕获的局部变量的变量名集合，本层赋值，且被内层代码段引用的变量）  
+co_filename   （PyStringObject，源文件名，Code Block所对应的.py文件的完整路径）  
+co_name;      /* string (name, for reference) Code Block的名字，通常是函数名或类名*/  
+co_firstlineno（4字节，该代码对象中源码的首行对应行号）  
+co_lnotab     （PyStringObject，字节码偏移量与源码行号的对应关系）  
+============== &lt;- 顶层PyCodeObject结束。文件结束 
+</code></pre><p>Pystringobject layout in .pyc files代码</p>
+<pre><code>=========== &lt;- PyStringObject起始  
+TYPE_STRING（=&apos;s&apos;，1字节，PyStringObject的类型标识）  
+length     （4字节，字符串内容的长度）  
+data       （byte数组，字符串内容）  
+=========== &lt;- PyStringObject结束  
+</code></pre><p>co_consts常量表</p>
+<pre><code>#define TYPE_NULL               &apos;0&apos;  
+#define TYPE_NONE               &apos;N&apos;  
+#define TYPE_FALSE              &apos;F&apos;  
+#define TYPE_TRUE               &apos;T&apos;  
+#define TYPE_STOPITER           &apos;S&apos;  
+#define TYPE_ELLIPSIS           &apos;.&apos;  
+#define TYPE_INT                &apos;i&apos;  
+#define TYPE_INT64              &apos;I&apos;  
+#define TYPE_FLOAT              &apos;f&apos;  
+#define TYPE_BINARY_FLOAT       &apos;g&apos;  
+#define TYPE_COMPLEX            &apos;x&apos;  
+#define TYPE_BINARY_COMPLEX     &apos;y&apos;  
+#define TYPE_LONG               &apos;l&apos;  
+#define TYPE_STRING             &apos;s&apos;  
+#define TYPE_INTERNED           &apos;t&apos;  
+#define TYPE_STRINGREF          &apos;R&apos;  
+#define TYPE_TUPLE              &apos;(&apos;  
+#define TYPE_LIST               &apos;[&apos;  
+#define TYPE_DICT               &apos;{&apos;  
+#define TYPE_CODE               &apos;c&apos;  
+#define TYPE_UNICODE            &apos;u&apos;  
+#define TYPE_UNKNOWN            &apos;?&apos;  
+#define TYPE_SET                &apos;&lt;&apos;  
+#define TYPE_FROZENSET          &apos;&gt;&apos;  
+</code></pre><h3 id="上手逆"><a href="#上手逆" class="headerlink" title="上手逆"></a>上手逆</h3><p>最简单的没做过处理的可以用这个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/wibiti/uncompyle2</span><br><span class="line">python setup.py install</span><br></pre></td></tr></table></figure>
+<p>有经验的py程序员会在发布程序的时候修改pyc的字节比如头8个字节，这修改成不合法的，然后你反编译就失败了</p>
+<p>可以用dis把二进制反编译CPython bytecode。用marshal把字符串转换成pyopcode对象，具体可以参考<a href="http://0x48.pw/2017/03/20/0x2f/#" target="_blank" rel="noopener">大佬</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import dis, marshal</span><br><span class="line">&gt;&gt;&gt; f = open(&quot;xxx.pyc&quot;)</span><br><span class="line">&gt;&gt;&gt; f.read(4)</span><br><span class="line">&apos;\x03\xf3\r\n&apos;               # magic number</span><br><span class="line">&gt;&gt;&gt; f.read(4)                # time</span><br><span class="line">&apos;f4oX&apos;</span><br><span class="line">&gt;&gt;&gt; code = marshal.load(f)</span><br><span class="line">&gt;&gt;&gt; code.co_argcount          # 参数的个数</span><br><span class="line">0</span><br><span class="line">&gt;&gt;&gt; code.co_varnames          # 局部变量</span><br><span class="line">()</span><br><span class="line">&gt;&gt;&gt; code.co_consts            # 常量 </span><br><span class="line">&gt;&gt;&gt; code.co_name              # 当前对象名 </span><br><span class="line">&gt;&gt;&gt; code.co_names			  # 当前对象中使用的对象名</span><br><span class="line">&gt;&gt;&gt; code.co_code                  </span><br><span class="line">&apos;\x99\x00\x00\x99\x01\x00\x86\x00\x00\x91\x00\x00\x99\x02\x00\x88\x00\x00\x91\x01\x00\x99\x03\x00\x88\x00\x00\x91\x02\x00\x99\x01\x00S&apos;</span><br><span class="line"># CPython bytecode的二进制, 可以通过dis反编译</span><br><span class="line">&gt;&gt;&gt; dis.disassemble_string(code.co_code)</span><br><span class="line">          0 &lt;153&gt;               0</span><br><span class="line">          3 &lt;153&gt;               1</span><br><span class="line">          6 MAKE_CLOSURE        0</span><br><span class="line">          9 EXTENDED_ARG        0</span><br><span class="line">         12 &lt;153&gt;               2</span><br><span class="line">         15 LOAD_DEREF          0</span><br><span class="line">         18 EXTENDED_ARG        1</span><br><span class="line">         21 &lt;153&gt;               3</span><br><span class="line">         24 LOAD_DEREF          0</span><br><span class="line">         27 EXTENDED_ARG        2</span><br><span class="line">         30 &lt;153&gt;               1</span><br><span class="line">         33 RETURN_VALUE</span><br></pre></td></tr></table></figure></p>
+<p>可以用showfile.py让结果更为清晰<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">import dis, marshal, struct, sys, time, types  </span><br><span class="line">  </span><br><span class="line">def show_file(fname):  </span><br><span class="line">    f = open(fname, &quot;rb&quot;)  </span><br><span class="line">    magic = f.read(4)  </span><br><span class="line">    moddate = f.read(4)  </span><br><span class="line">    modtime = time.asctime(time.localtime(struct.unpack(&apos;L&apos;, moddate)[0]))  </span><br><span class="line">    print &quot;magic %s&quot; % (magic.encode(&apos;hex&apos;))  </span><br><span class="line">    print &quot;moddate %s (%s)&quot; % (moddate.encode(&apos;hex&apos;), modtime)  </span><br><span class="line">    code = marshal.load(f)  </span><br><span class="line">    show_code(code)  </span><br><span class="line">       </span><br><span class="line">def show_code(code, indent=&apos;&apos;):  </span><br><span class="line">    old_indent = indent  </span><br><span class="line">    print &quot;%s&lt;code&gt;&quot; % indent  </span><br><span class="line">    indent += &apos;   &apos;  </span><br><span class="line">    print &quot;%s&lt;argcount&gt; %d &lt;/argcount&gt;&quot; % (indent, code.co_argcount)  </span><br><span class="line">    print &quot;%s&lt;nlocals&gt; %d&lt;/nlocals&gt;&quot; % (indent, code.co_nlocals)  </span><br><span class="line">    print &quot;%s&lt;stacksize&gt; %d&lt;/stacksize&gt;&quot; % (indent, code.co_stacksize)  </span><br><span class="line">    print &quot;%s&lt;flags&gt; %04x&lt;/flags&gt;&quot; % (indent, code.co_flags)  </span><br><span class="line">    show_hex(&quot;code&quot;, code.co_code, indent=indent)  </span><br><span class="line">    print &quot;%s&lt;dis&gt;&quot; % indent  </span><br><span class="line">    dis.disassemble(code)  </span><br><span class="line">    print &quot;%s&lt;/dis&gt;&quot; % indent  </span><br><span class="line">  </span><br><span class="line">    print &quot;%s&lt;names&gt; %r&lt;/names&gt;&quot; % (indent, code.co_names)  </span><br><span class="line">    print &quot;%s&lt;varnames&gt; %r&lt;/varnames&gt;&quot; % (indent, code.co_varnames)  </span><br><span class="line">    print &quot;%s&lt;freevars&gt; %r&lt;/freevars&gt;&quot; % (indent, code.co_freevars)  </span><br><span class="line">    print &quot;%s&lt;cellvars&gt; %r&lt;/cellvars&gt;&quot; % (indent, code.co_cellvars)  </span><br><span class="line">    print &quot;%s&lt;filename&gt; %r&lt;/filename&gt;&quot; % (indent, code.co_filename)  </span><br><span class="line">    print &quot;%s&lt;name&gt; %r&lt;/name&gt;&quot; % (indent, code.co_name)  </span><br><span class="line">    print &quot;%s&lt;firstlineno&gt; %d&lt;/firstlineno&gt;&quot; % (indent, code.co_firstlineno)  </span><br><span class="line">  </span><br><span class="line">    print &quot;%s&lt;consts&gt;&quot; % indent  </span><br><span class="line">    for const in code.co_consts:  </span><br><span class="line">        if type(const) == types.CodeType:  </span><br><span class="line">            show_code(const, indent+&apos;   &apos;)  </span><br><span class="line">        else:  </span><br><span class="line">            print &quot;   %s%r&quot; % (indent, const)  </span><br><span class="line">    print &quot;%s&lt;/consts&gt;&quot; % indent  </span><br><span class="line">  </span><br><span class="line">    show_hex(&quot;lnotab&quot;, code.co_lnotab, indent=indent)  </span><br><span class="line">    print &quot;%s&lt;/code&gt;&quot; % old_indent  </span><br><span class="line">       </span><br><span class="line">def show_hex(label, h, indent):  </span><br><span class="line">    h = h.encode(&apos;hex&apos;)  </span><br><span class="line">    if len(h) &lt; 60:  </span><br><span class="line">        print &quot;%s&lt;%s&gt; %s&lt;/%s&gt;&quot; % (indent, label, h,label)  </span><br><span class="line">    else:  </span><br><span class="line">        print &quot;%s&lt;%s&gt;&quot; % (indent, label)  </span><br><span class="line">        for i in range(0, len(h), 60):  </span><br><span class="line">            print &quot;%s   %s&quot; % (indent, h[i:i+60])  </span><br><span class="line">        print &quot;%s&lt;/%s&gt;&quot; % (indent, label)  </span><br><span class="line">  </span><br><span class="line">show_file(sys.argv[1])</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">showfile.py test.pyc &gt;test.xml</span><br></pre></td></tr></table></figure>
+<p>很多情况会遇到损坏的pyc，于是就需要手动来逆，尝试逆了下一个文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">03f3 0d0a	python版本</span><br><span class="line">6634 6f58	.pyc对应的源文件的修改时间</span><br><span class="line">63			=&apos;c&apos;，1字节，PyCodeObject的类型标识</span><br><span class="line">00 00 00 00	4字节，位置参数的个数</span><br><span class="line">00 00 00 00	4字节，局部变量（包括位置参数）的个数</span><br><span class="line">02 0000 00	4字节，求值栈的最大深度</span><br><span class="line">40 0000 00	4字节，用来表示参数中是否有*args或者 **kwargs</span><br><span class="line">73 			=&apos;s&apos;，1字节，PyStringObject的类型标识</span><br><span class="line">2200 0000 	4字节，字符串内容的长度</span><br><span class="line">9900 00		</span><br><span class="line">99 0100 </span><br><span class="line">8600 00</span><br><span class="line">91 0000 </span><br><span class="line">9902 00 	opcode</span><br><span class="line">88 0000</span><br><span class="line">9101 00</span><br><span class="line">99 0300 </span><br><span class="line">8800 00</span><br><span class="line">91 0200 </span><br><span class="line">9901 00</span><br><span class="line">53 </span><br><span class="line"></span><br><span class="line">28				=&quot;(&quot; TYPE_TUPLE</span><br><span class="line">04 				元组个数</span><br><span class="line">0000 00			</span><br><span class="line">69 ffff ffff 	69=&quot;i&quot;(TYPE_INT) -1</span><br><span class="line">4e 				=&quot;N&quot; TYPE_NONE</span><br><span class="line">63 				=&apos;c&apos;，1字节，PyCodeObject的类型标识</span><br><span class="line">01 00 0000 		4字节，位置参数的个数</span><br><span class="line">0600 0000 		4字节，局部变量（包括位置参数）的个数</span><br><span class="line">0300 0000 		4字节，求值栈的最大深度</span><br><span class="line">4300 0000 		4字节，用来表示参数中是否有*args或者 **kwargs</span><br><span class="line">73				=&apos;s&apos;，1字节，PyStringObject的类型标识</span><br><span class="line">5c 000000		4字节，字符串内容的长度</span><br><span class="line"></span><br><span class="line">99 0100 6801 0099 0200 6802 0099 0300</span><br><span class="line">6803 0061 0100 9904 0046 9905 0027 6102</span><br><span class="line">0061 0100 2761 0300 2799 0600 4627 9905  	opcode</span><br><span class="line">0027 6102 0099 0600 4627 9907 0027 6804</span><br><span class="line">009b 0000 6001 0061 0400 8301 0068 0500</span><br><span class="line">6105 0060 0200 6100 0083 0100 53</span><br><span class="line"></span><br><span class="line">28 				=&quot;(&quot; TYPE_TUPLE</span><br><span class="line">08				元组个数</span><br><span class="line">00	0000 </span><br><span class="line">4e    			=&quot;N&quot; TYPE_NONE</span><br><span class="line">73 				=&apos;s&apos;，1字节，PyStringObject的类型标识</span><br><span class="line">0800 0000 		4字节，字符串内容的长度</span><br><span class="line">2140 2324 255e 262a   &quot;!@#$%^&amp;*&quot;</span><br><span class="line">74				=&quot;t&quot; TYPE_INTERNED					</span><br><span class="line">08 0000 00		</span><br><span class="line">61 6263 6465 6667 68	&quot;abcdefgh&quot;</span><br><span class="line"></span><br><span class="line">73 				=&apos;s&apos;，1字节，PyStringObject的类型标识</span><br><span class="line">0600 0000 		4字节，字符串内容的长度</span><br></pre></td></tr></table></figure></p>
+<h3 id="防逆向"><a href="#防逆向" class="headerlink" title="防逆向"></a>防逆向</h3><ul>
+<li>python是解释型语言，可以从代码层面做混淆，即使逆出来，也很难看懂，如果代码量很大的话，嘿嘿。可以使用pyminifier或在线源码混淆<a href="http://pyob.oxyry.com/" target="_blank" rel="noopener">http://pyob.oxyry.com/</a>，只是基本的文本查找与替换，更深层次使用AST<a href="http://jbremer.org/python-source-obfuscation-using-asts/" target="_blank" rel="noopener">http://jbremer.org/python-source-obfuscation-using-asts/</a></li>
+</ul>
+<p>obscutor.py<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br></pre></td><td class="code"><pre><span class="line">import ast</span><br><span class="line">from ast import Assign, Name, Call, Store, Load, Str, Num, List, Add, BinOp</span><br><span class="line">from ast import Subscript, Slice, Attribute, GeneratorExp, comprehension</span><br><span class="line">from ast import Compare, Mult</span><br><span class="line">import codegen</span><br><span class="line">import random</span><br><span class="line">import sys</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def random_string(minlength, maxlength):</span><br><span class="line">    return &apos;&apos;.join(chr(random.randint(0x61, 0x7a))</span><br><span class="line">                   for x in xrange(random.randint(minlength, maxlength)))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def import_node(name, newname):</span><br><span class="line">    &quot;&quot;&quot;Import module obfuscation&quot;&quot;&quot;</span><br><span class="line">    # import sys -&gt; sys = __import__(&apos;sys&apos;, globals(), locals(), [], -1)</span><br><span class="line">    return Assign(</span><br><span class="line">        targets=[Name(id=newname, ctx=Store())],</span><br><span class="line">        value=Call(func=Name(id=&apos;__import__&apos;, ctx=Load()),</span><br><span class="line">                   args=[Str(s=name),</span><br><span class="line">                         Call(func=Name(id=&apos;globals&apos;, ctx=Load()), args=[],</span><br><span class="line">                              keywords=[], starargs=None, kwargs=None),</span><br><span class="line">                         Call(func=Name(id=&apos;locals&apos;, ctx=Load()), args=[],</span><br><span class="line">                              keywords=[], starargs=None, kwargs=None),</span><br><span class="line">                         List(elts=[], ctx=Load()), Num(n=-1)],</span><br><span class="line">                   keywords=[], starargs=None, kwargs=None))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def obfuscate_string(s):</span><br><span class="line">    &quot;&quot;&quot;Various String Obfuscation routines.&quot;&quot;&quot;</span><br><span class="line">    randstr = random_string(3, 10)</span><br><span class="line"></span><br><span class="line">    table0 = [</span><br><span class="line">        # &apos;&apos; -&gt; &apos;&apos;</span><br><span class="line">        lambda: Str(s=&apos;&apos;),</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    table1 = [</span><br><span class="line">        # &apos;a&apos; -&gt; &apos;a&apos;</span><br><span class="line">        lambda x: Str(s=chr(x)),</span><br><span class="line">        # &apos;a&apos; -&gt; chr(0x61)</span><br><span class="line">        lambda x: Call(func=Name(id=&apos;chr&apos;, ctx=Load()), args=[Num(n=x)],</span><br><span class="line">                       keywords=[], starargs=None, kwargs=None),</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    table = [</span><br><span class="line">        # &apos;abc&apos; -&gt; &apos;abc&apos;</span><br><span class="line">        lambda x: Str(s=x),</span><br><span class="line">        # &apos;abc&apos; -&gt; &apos;a&apos; + &apos;bc&apos;</span><br><span class="line">        lambda x: BinOp(left=Str(s=x[:len(x)/2]),</span><br><span class="line">                        op=Add(),</span><br><span class="line">                        right=Str(s=x[len(x)/2:])),</span><br><span class="line">        # &apos;abc&apos; -&gt; &apos;cba&apos;[::-1]</span><br><span class="line">        lambda x: Subscript(value=Str(s=x[::-1]),</span><br><span class="line">                            slice=Slice(lower=None, upper=None,</span><br><span class="line">                                        step=Num(n=-1)),</span><br><span class="line">                            ctx=Load()),</span><br><span class="line">        # &apos;abc&apos; -&gt; &apos;&apos;.join(_x for _x in reversed(&apos;cba&apos;))</span><br><span class="line">        lambda x: Call(</span><br><span class="line">            func=Attribute(value=Str(s=&apos;&apos;), attr=&apos;join&apos;, ctx=Load()), args=[</span><br><span class="line">                GeneratorExp(elt=Name(id=randstr, ctx=Load()), generators=[</span><br><span class="line">                    comprehension(target=Name(id=randstr, ctx=Store()),</span><br><span class="line">                                  iter=Call(func=Name(id=&apos;reversed&apos;,</span><br><span class="line">                                                      ctx=Load()),</span><br><span class="line">                                            args=[Str(s=x[::-1])],</span><br><span class="line">                                            keywords=[], starargs=None,</span><br><span class="line">                                            kwargs=None),</span><br><span class="line">                                  ifs=[])])],</span><br><span class="line">            keywords=[], starargs=None, kwargs=None),</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    if not len(s):</span><br><span class="line">        return random.choice(table0)()</span><br><span class="line"></span><br><span class="line">    if len(s) == 1:</span><br><span class="line">        return random.choice(table1)(ord(s))</span><br><span class="line"></span><br><span class="line">    return random.choice(table)(s)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Obfuscator(ast.NodeTransformer):</span><br><span class="line">    def __init__(self):</span><br><span class="line">        ast.NodeTransformer.__init__(self)</span><br><span class="line"></span><br><span class="line">        # imported modules</span><br><span class="line">        self.imports = &#123;&#125;</span><br><span class="line"></span><br><span class="line">        # global values (can be renamed)</span><br><span class="line">        self.globs = &#123;&#125;</span><br><span class="line"></span><br><span class="line">        # local values</span><br><span class="line">        self.locs = &#123;&#125;</span><br><span class="line"></span><br><span class="line">        # inside a function</span><br><span class="line">        self.indef = False</span><br><span class="line"></span><br><span class="line">    def obfuscate_global(self, name):</span><br><span class="line">        newname = random_string(3, 10)</span><br><span class="line">        self.globs[name] = newname</span><br><span class="line">        return newname</span><br><span class="line"></span><br><span class="line">    def obfuscate_local(self, name):</span><br><span class="line">        newname = random_string(3, 10)</span><br><span class="line">        self.locs[name] = newname</span><br><span class="line">        return newname</span><br><span class="line"></span><br><span class="line">    def visit_Import(self, node):</span><br><span class="line">        newname = self.obfuscate_global(node.names[0].name)</span><br><span class="line">        self.imports[node.names[0].name] = newname</span><br><span class="line"></span><br><span class="line">    def visit_If(self, node):</span><br><span class="line">        if isinstance(node.test, Compare) and \</span><br><span class="line">                isinstance(node.test.left, Name) and \</span><br><span class="line">                node.test.left.id == &apos;__name__&apos;:</span><br><span class="line">            for x, y in self.imports.items():</span><br><span class="line">                node.body.insert(0, import_node(x, y))</span><br><span class="line">        node.test = self.visit(node.test)</span><br><span class="line">        node.body = [self.visit(x) for x in node.body]</span><br><span class="line">        node.orelse = [self.visit(x) for x in node.orelse]</span><br><span class="line">        return node</span><br><span class="line"></span><br><span class="line">    def visit_Str(self, node):</span><br><span class="line">        return obfuscate_string(node.s)</span><br><span class="line"></span><br><span class="line">    def visit_Num(self, node):</span><br><span class="line">        d = random.randint(1, 256)</span><br><span class="line">        return BinOp(left=BinOp(left=Num(node.n / d), op=Mult(),</span><br><span class="line">                                right=Num(n=d)),</span><br><span class="line">                     op=Add(), right=Num(node.n % d))</span><br><span class="line"></span><br><span class="line">    def visit_Attribute(self, node):</span><br><span class="line">        if isinstance(node.value, Name) and isinstance(node.value.ctx, Load):</span><br><span class="line">            node.value = self.visit(node.value)</span><br><span class="line">            return Call(func=Name(id=&apos;getattr&apos;, ctx=Load()), args=[</span><br><span class="line">                Name(id=node.value.id, ctx=Load()), Str(s=node.attr)],</span><br><span class="line">                keywords=[], starargs=None, kwargs=None)</span><br><span class="line">        node.value = self.visit(node.value)</span><br><span class="line">        return node</span><br><span class="line"></span><br><span class="line">    def visit_FunctionDef(self, node):</span><br><span class="line">        self.indef = True</span><br><span class="line">        self.locs = &#123;&#125;</span><br><span class="line">        node.name = self.obfuscate_global(node.name)</span><br><span class="line">        node.body = [self.visit(x) for x in node.body]</span><br><span class="line">        self.indef = False</span><br><span class="line">        return node</span><br><span class="line"></span><br><span class="line">    def visit_Name(self, node):</span><br><span class="line">        # obfuscate known globals</span><br><span class="line">        if not self.indef and isinstance(node.ctx, Store) and \</span><br><span class="line">                node.id in (&apos;teamname&apos;, &apos;flag&apos;):</span><br><span class="line">            node.id = self.obfuscate_global(node.id)</span><br><span class="line">        #elif self.indef:</span><br><span class="line">            #if isinstance(node.ctx, Store):</span><br><span class="line">                #node.id = self.obfuscate_local(node.id)</span><br><span class="line">            #node.id = self.locs.get(node.id, node.id)</span><br><span class="line">        node.id = self.globs.get(node.id, node.id)</span><br><span class="line">        return node</span><br><span class="line"></span><br><span class="line">    def visit_Module(self, node):</span><br><span class="line">        node.body = [y for y in (self.visit(x) for x in node.body) if y]</span><br><span class="line">        node.body = [y for y in (self.visit(x) for x in node.body) if y]</span><br><span class="line">        return node</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class GlobalsEnforcer(ast.NodeTransformer):</span><br><span class="line">    def __init__(self, globs):</span><br><span class="line">        ast.NodeTransformer.__init__(self)</span><br><span class="line">        self.globs = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    def visit_Name(self, node):</span><br><span class="line">        node.id = self.globs.get(node.id, node.id)</span><br><span class="line">        return node</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    if len(sys.argv) != 2:</span><br><span class="line">        print &apos;Usage: python %s &lt;pyfile&gt;&apos; % sys.argv[0]</span><br><span class="line">        exit(0)</span><br><span class="line"></span><br><span class="line">    if sys.argv[1] == &apos;-&apos;:</span><br><span class="line">        root = ast.parse(sys.stdin.read())</span><br><span class="line">    else:</span><br><span class="line">        root = ast.parse(open(sys.argv[1], &apos;rb&apos;).read())</span><br><span class="line"></span><br><span class="line">    # obfuscate the AST</span><br><span class="line">    obf = Obfuscator()</span><br><span class="line">    root = obf.visit(root)</span><br><span class="line"></span><br><span class="line">    # resolve all global names</span><br><span class="line">    root = GlobalsEnforcer(obf.globs).visit(root)</span><br><span class="line"></span><br><span class="line">    print codegen.to_source(root)</span><br></pre></td></tr></table></figure></p>
+<p>一个简单的py文件，写了递归相乘</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def fact(n):</span><br><span class="line">    return fact_iter(n, 1)</span><br><span class="line"></span><br><span class="line">def fact_iter(num, product):</span><br><span class="line">    if num == 1:</span><br><span class="line">        return product</span><br><span class="line">    return fact_iter(num - 1, num * product)</span><br><span class="line">	</span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">	fact()</span><br></pre></td></tr></table></figure>
+<p>混淆后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def broztlk(n):</span><br><span class="line">    return prux(n, 0 * 132 + 0 * 0 * 251 + 77 + 0 * 103 + 1)</span><br><span class="line"></span><br><span class="line">def rci(num, product):</span><br><span class="line">    if (num == 0 * 171 + 0 * 0 * 163 + 55 + 0 * 36 + 1):</span><br><span class="line">        return product</span><br><span class="line">    return rci(num - 0 * 57 + 0 * 1 * 113 + 81 + 0 * 166 + 1, num * product)</span><br><span class="line">if (__name__ == &apos;__ma&apos; + &apos;in__&apos;):</span><br><span class="line">    broztlk()</span><br></pre></td></tr></table></figure>
+<p>如果再做一些变量替换就更看不出来它在干嘛了吧</p>
+<ul>
+<li>用py2exe/pyinstaller啥的打包一下<br>逆向只是时间问题</li>
+<li>借助cython<br><a href="http://cython.org/" target="_blank" rel="noopener">cython</a>可以将python文件转换成c, 并编译成pyd文件. 一般将核心模块编译成pyd, 这样被破解的风险就大大降低了. 关于如何使用cython可以参考官网或者<a href="http://www.oschina.net/question/54100_39042" target="_blank" rel="noopener">这篇文章</a> 或者 <a href="http://blog.biicode.com/bii-internals-compiling-your-python-application-with-cython/" target="_blank" rel="noopener">这篇</a></li>
+<li><p>使用自己的Bytecode指令集<br>也就是说自己编一个python虚拟机，代价较大</p>
+</li>
+<li><p>修改字节码<br>修改一些字节码使得代码逻辑无误，但是破坏了原来的pyc的结构，此时使用dis、marshal因为逆向的逻辑而无法解析，具体方法参考大佬<a href="http://blog.csdn.net/ir0nf1st/article/details/61650984" target="_blank" rel="noopener">http://blog.csdn.net/ir0nf1st/article/details/61650984</a></p>
+</li>
+</ul>
+<p>参考链接：</p>
+<pre><code>[http://phantom0301.cc/2017/03/24/pythonopcode/](http://phantom0301.cc/2017/03/24/pythonopcode/)
+
+[http://0x48.pw/2017/03/20/0x2f/#](http://0x48.pw/2017/03/20/0x2f/#)
+
+[http://blog.csdn.net/ir0nf1st/article/details/61650984](http://blog.csdn.net/ir0nf1st/article/details/61650984)
+
+[https://stackoverflow.com/questions/261638/how-do-i-protect-python-code](https://stackoverflow.com/questions/261638/how-do-i-protect-python-code)
+</code></pre>  
+	</div>
+
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://michaelwayneliu.github.io/强大的pyc.html" data-title="MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+
+<!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zMjUxMS85MDcy">
+<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+</script>
+<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+
+
+	
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</div>  
+        </div>
+        <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m MS in SCU. <br/>
+			Just have a little faith.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/杀手莱昂的美丽人生" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="MS">MS</a>
+		
+		
+		</p>
+</div>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+      Total visits: <span id="busuanzi_value_site_pv"></span>
+</span>
+<span id="busuanzi_container_site_uv">
+      You are Visiter No.<span id="busuanzi_value_site_uv"></span>
+</span>
+</footer>
+        <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'msarehere';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255712369'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255712369' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+      </body>
+     </html>
+     

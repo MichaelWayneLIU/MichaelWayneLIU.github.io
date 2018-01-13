@@ -1,0 +1,738 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>opcache那些事 | MSAREHERE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="MS">
+    
+
+    
+    <meta name="description" content="在 PHP 7.0 发布之初，就有不少 PHP 开发人员对其性能提升方面非常关注。在引入 OPcache 后，PHP的性能的确有了很大的提升，之后，很多开发人员都开始采用 OPcache 作为 PHP 应用的加速器。OPcache 带来良好性能的同时也带来了新的安全隐患。">
+<meta name="keywords" content="Opcache,php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="opcache那些事">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/index.html">
+<meta property="og:site_name" content="MSAREHERE">
+<meta property="og:description" content="在 PHP 7.0 发布之初，就有不少 PHP 开发人员对其性能提升方面非常关注。在引入 OPcache 后，PHP的性能的确有了很大的提升，之后，很多开发人员都开始采用 OPcache 作为 PHP 应用的加速器。OPcache 带来良好性能的同时也带来了新的安全隐患。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/php-compile-execute-process.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/compile-execute.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/cache-optimization-steps.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/system_id.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/timestamp.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/malware_hunter.png">
+<meta property="og:updated_time" content="2018-01-13T02:07:44.545Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="opcache那些事">
+<meta name="twitter:description" content="在 PHP 7.0 发布之初，就有不少 PHP 开发人员对其性能提升方面非常关注。在引入 OPcache 后，PHP的性能的确有了很大的提升，之后，很多开发人员都开始采用 OPcache 作为 PHP 应用的加速器。OPcache 带来良好性能的同时也带来了新的安全隐患。">
+<meta name="twitter:image" content="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/php-compile-execute-process.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="MSAREHERE" title="MSAREHERE"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="MSAREHERE">MSAREHERE</a></h1>
+				<h2 class="blog-motto">Just have a little faith</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页 | Home</a></li>
+					
+						<li><a href="/archives">归档 | Archives</a></li>
+					
+						<li><a href="/categories">分类 | Categories</a></li>
+					
+						<li><a href="/tags">标签 | Tags</a></li>
+					
+						<li><a href="/about">关于 | About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:michaelwayneliu.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/01/13/opcache那些事/" title="opcache那些事" itemprop="url">opcache那些事</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
+		
+  <p class="article-time">
+    <time datetime="2018-01-13T01:52:53.000Z" itemprop="datePublished"> 发表于 2018-01-13</time>
+    <span id="busuanzi_container_page_pv">
+    总阅读<span id="busuanzi_value_page_pv"></span>次
+</span>
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#opcache原理"><span class="toc-number">1.</span> <span class="toc-text"><a href="#opcache&#x539F;&#x7406;" class="headerlink" title="opcache&#x539F;&#x7406;"></a>opcache&#x539F;&#x7406;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何利用"><span class="toc-number">2.</span> <span class="toc-text"><a href="#&#x5982;&#x4F55;&#x5229;&#x7528;" class="headerlink" title="&#x5982;&#x4F55;&#x5229;&#x7528;"></a>&#x5982;&#x4F55;&#x5229;&#x7528;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#本地检测"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x672C;&#x5730;&#x68C0;&#x6D4B;" class="headerlink" title="&#x672C;&#x5730;&#x68C0;&#x6D4B;"></a>&#x672C;&#x5730;&#x68C0;&#x6D4B;</span></a></li></ol>
+		
+		</div>
+		
+		<p>在 PHP 7.0 发布之初，就有不少 PHP 开发人员对其性能提升方面非常关注。在引入 OPcache 后，PHP的性能的确有了很大的提升，之后，很多开发人员都开始采用 OPcache 作为 PHP 应用的加速器。OPcache 带来良好性能的同时也带来了新的安全隐患。<br><a id="more"></a><br>在 PHP 7.0 发布之初，就有不少 PHP 开发人员对其性能提升方面非常关注。在引入 OPcache 后，PHP的性能的确有了很大的提升，之后，很多开发人员都开始采用 OPcache 作为 PHP 应用的加速器。OPcache 带来良好性能的同时也带来了新的安全隐患。</p>
+<h3 id="opcache原理"><a href="#opcache原理" class="headerlink" title="opcache原理"></a>opcache原理</h3><p>PHP是一种脚本语言，默认情况下，它会编译任何要求它运行的文件，从编译中获取OPCodes，运行它们并立即将其清除。在生产服务器上，PHP代码在几个请求之间不太可能发生变化，因此，编译步骤将始终读取相同的源代码，从而导致运行完全相同的OPCode。这对于时间和资源来说是一个很大的浪费，因为每一个脚本都会针对每个请求调用PHP编译器。</p>
+<p><img src="/2018/01/13/opcache那些事/php-compile-execute-process.png" alt="image"></p>
+<p>于是大佬设计出了OPCode缓存，每个PHP脚本只编译一次，并将生成的OPCodes缓存到共享内存中，这样PHP-FPM就可以从内存中直接读取OPCodes执行。</p>
+<p><img src="/2018/01/13/opcache那些事/compile-execute.png" alt="image"></p>
+<p>OPCache已经成为官方推荐的OPCode缓存解决方案，并从PHP 5.5.0开始捆绑到PHP源代码中</p>
+<p><img src="/2018/01/13/opcache那些事/cache-optimization-steps.png" alt="image"></p>
+<h3 id="如何利用"><a href="#如何利用" class="headerlink" title="如何利用"></a>如何利用</h3><p>可以针对上传攻击或者是拿到主机权限做修改来进行利用。如果是上传攻击，需要php.ini配置如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[opcache]</span><br><span class="line">zend_extension=opcache.so</span><br><span class="line">opcache.enable=1</span><br><span class="line">opcache.file_cache = /tmp/opcache</span><br><span class="line">opcache.validate_timestamps = 0</span><br><span class="line">opcache.file_cache_only = 1       ; PHP 7&apos;s default is 0</span><br></pre></td></tr></table></figure></p>
+<p>对应解释如下，<a href="http://php.net/manual/zh/opcache.configuration.php" target="_blank" rel="noopener">参考</a></p>
+<table>
+<thead>
+<tr>
+<th>名字</th>
+<th>默认</th>
+<th>可修改范围</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>opcache.enable</td>
+<td>“1”</td>
+<td>PHP_INI_ALL</td>
+<td>是否启用opcache</td>
+</tr>
+<tr>
+<td>opcache.validate_timestamps</td>
+<td>“1”</td>
+<td>PHP_INI_ALL</td>
+<td>如果置为1，则OPCACHE会自动检测文件的时间戳（检测周期为revalidate_freq),并根据文件的时间戳来更新opcode,如果置为0，则只能手动去重启opcache或重启webserver以使更新后的php文件生效</td>
+<td></td>
+</tr>
+<tr>
+<td>opcache.revalidate_freq</td>
+<td>“1”</td>
+<td>PHP_INI_ALL</td>
+<td>opcache自动检测文件是否更新的周期，单位秒。如果是0，则每次请求时opcache都要进行检测。当validate_timestamps为0时,本指令无效</td>
+</tr>
+<tr>
+<td>opcache.file_cache_only</td>
+<td>“0”</td>
+<td>PHP_INI_SYSTEM</td>
+<td>启用或禁用在共享内存中的 opcode 缓存</td>
+</tr>
+<tr>
+<td>opcache.file_cache</td>
+<td>NULL</td>
+<td>PHP_INI_SYSTEM</td>
+<td>配置二级缓存目录并启用二级缓存。启用二级缓存可以在 SHM内存满了、服务器重启或者重置 SHM 的时候提高性能。 默认值为空字符串 “”，表示禁用基于文件的缓存。</td>
+</tr>
+</tbody>
+</table>
+<p>TIPS:</p>
+<pre><code>PHP总共有4个配置指令作用域：（PHP中的每个指令都有自己的作用域，指令只能在其作用域中修改，不是任何地方都能修改配置指令的）
+PHP_INI_PERDIR：指令可以在php.ini、httpd.conf或.htaccess文件中修改
+PHP_INI_SYSTEM：指令可以在php.ini 和 httpd.conf 文件中修改
+PHP_INI_USER：指令可以在用户脚本中修改
+PHP_INI_ALL：指令可以在任何地方修改
+</code></pre><p>所以我们需要的关键条件不能通过ini_set动态更改</p>
+<p>在指定的目录中，OPcache 会存储已编译的 PHP 脚本文件，这些缓存文件被放置在和 Web 目录一致的目录结构中。如，编译后的 /var/www/index.php 文件的缓存会被存储在 /tmp/opcache/[system_id]/var/www/index.php.bin 中。system_id 是当前 PHP 版本号，Zend 扩展版本号以及各个数据类型大小的 MD5 哈希值。计算system_id可以用<a href="https://github.com/GoSecure/php7-opcache-override" target="_blank" rel="noopener">这个</a>，如果计算出的system_id值和预期不同，可以参考我改动的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line"></span><br><span class="line"># Copyright (c) 2016 GoSecure Inc.</span><br><span class="line"></span><br><span class="line">import sys</span><br><span class="line">import re</span><br><span class="line">import requests</span><br><span class="line">from md5 import md5</span><br><span class="line"></span><br><span class="line">if len(sys.argv) != 2:</span><br><span class="line">    print sys.argv[0] + &quot; [file|URL]&quot;</span><br><span class="line">    exit(0)</span><br><span class="line"></span><br><span class="line">if (sys.argv[1].startswith(&quot;http&quot;)):</span><br><span class="line">    text = requests.get(sys.argv[1]).text</span><br><span class="line">else:</span><br><span class="line">    with open(sys.argv[1]) as file:</span><br><span class="line">        text = file.read()</span><br><span class="line">        file.close()</span><br><span class="line"></span><br><span class="line"># PHP Version</span><br><span class="line">php_version = re.search(&apos;&lt;tr&gt;&lt;td class=&quot;e&quot;&gt;PHP Version &lt;/td&gt;&lt;td class=&quot;v&quot;&gt;(.*) &lt;/td&gt;&lt;/tr&gt;&apos;, text)</span><br><span class="line"></span><br><span class="line">if php_version == None:</span><br><span class="line">    php_version = re.search(&apos;&lt;h1 class=&quot;p&quot;&gt;PHP Version (.*)&apos;, text)</span><br><span class="line"></span><br><span class="line">if php_version == None:</span><br><span class="line">    print &quot;No PHP version found, is this a phpinfo file?&quot;</span><br><span class="line">    exit(0)</span><br><span class="line"></span><br><span class="line">php_version = php_version.group(1)</span><br><span class="line"></span><br><span class="line"># Zend Extension Build ID</span><br><span class="line">zend_extension_id = re.search(&apos;&lt;tr&gt;&lt;td class=&quot;e&quot;&gt;Zend Extension Build &lt;/td&gt;&lt;td class=&quot;v&quot;&gt;(.*) &lt;/td&gt;&lt;/tr&gt;&apos;, text)</span><br><span class="line">if zend_extension_id == None:</span><br><span class="line">    print &quot;No Zend Extension Build found.&quot;</span><br><span class="line">    exit(0)</span><br><span class="line">zend_extension_id = zend_extension_id.group(1)</span><br><span class="line"></span><br><span class="line"># Architecture</span><br><span class="line">architecture = re.search(&apos;&lt;tr&gt;&lt;td class=&quot;e&quot;&gt;System &lt;/td&gt;&lt;td class=&quot;v&quot;&gt;(.*) &lt;/td&gt;&lt;/tr&gt;&apos;, text)</span><br><span class="line">if architecture == None:</span><br><span class="line">    print &quot;No System info found.&quot;</span><br><span class="line">    exit(0)</span><br><span class="line">architecture = architecture.group(1).split()[-1]</span><br><span class="line"></span><br><span class="line"># Zend Bin ID suffix</span><br><span class="line">if architecture == &quot;x86_64&quot;:</span><br><span class="line">    bin_id_suffix = &quot;148888&quot;</span><br><span class="line">else:</span><br><span class="line">    bin_id_suffix = &quot;144444&quot;</span><br><span class="line"></span><br><span class="line">zend_bin_id = &quot;BIN_&quot; + bin_id_suffix</span><br><span class="line"></span><br><span class="line"># Logging</span><br><span class="line">print &quot;PHP version : &quot; + php_version</span><br><span class="line">print &quot;Zend Extension ID : &quot; + zend_extension_id</span><br><span class="line">print &quot;Zend Bin ID : &quot; + zend_bin_id</span><br><span class="line">print &quot;Assuming &quot; + architecture + &quot; architecture&quot;</span><br><span class="line"></span><br><span class="line">digest = md5(php_version + zend_extension_id + zend_bin_id).hexdigest()</span><br><span class="line">print &quot;------------&quot;</span><br><span class="line">print &quot;System ID : &quot; + digest</span><br></pre></td></tr></table></figure>
+<p>如果是上传攻击，需要知道以上的opcache的配置信息(可以是从phpinfo)，需要能上传到opcache.file_cache指定的目录，需要计算出正确的system_id，然后，本地创建一个webshell，生成一个编译后的 webshell 二进制缓存文件，把文件头的system_id改成前面提到的计算出来的目录机器的就行。</p>
+<p><img src="/2018/01/13/opcache那些事/system_id.png" alt="image"></p>
+<p>最后，上传恶意webshell 二进制缓存文件到opcache.file_cache指定的目录，覆盖掉目标机器的正常php文件生成的二进制缓存文件。访问那个原本正常的php文件，getshell</p>
+<p>如果目标机器file_cache_only = 0，内存缓存方式的优先级高于文件缓存，那么重写后的 OPcache 文件（webshell）是不会被执行的。但是，当 Web 服务器重启后，就可以绕过此限制。因为，当服务器重启之后，内存中的缓存为空，此时，OPcache 会使用文件缓存的数据填充内存缓存的数据，这样，webshell 就可以被执行了。还有就是如果对方存在一些常年不会访问到的php文件，就不会存在该文件的内存缓存和文件缓存。比如WordPress 等这类框架里面，有许多过时不用的文件依旧在发布的版本中能够访问，如：registration-functions.php，通过上传 webshell 的二进制缓存文件为 registration-functions.php.bin ，之后请求访问 /wp-includes/registration-functions.php ，此时 OPcache 就会加载我们所上传的 registration-functions.php.bin 缓存文件。</p>
+<p>如果目标机器validate_timestamps = 1，php会按照opcache.revalidate_freq设定的时间间隔定期校验php 源文件的时间戳与对应的缓存文件的时间戳的差别，如果两个时间戳不匹配，缓存文件将被丢弃，并且重新生成一份新的缓存文件。要想绕过此限制，攻击者必须知道目标源文件的时间戳。在比如wordpress等的框架中，有些文件从2012年之后从没有被修改过，如：registration-functions.php 和 registration.php 。知道了时间戳，攻击者就可以绕过 validate_timestamps 限制，成功覆盖缓存文件，执行 webshell。二进制缓存文件的时间戳在 34字节偏移处。</p>
+<p><img src="/2018/01/13/opcache那些事/timestamp.png" alt="image"></p>
+<p>当然如果攻击者能拿到主机权限，攻击者可能会按照上面的配置藏一个opcache后门。一般的基于检测源文件的webshell扫描工具无法扫描出当前php存在后门，如D盾。</p>
+<h3 id="本地检测"><a href="#本地检测" class="headerlink" title="本地检测"></a>本地检测</h3><p>如何知道自己中招没有呢？不是没有办法。使用<a href="https://github.com/GoSecure/php7-opcache-override" target="_blank" rel="noopener">这个</a></p>
+<p>其中OPcache Malware Hunter通过比对和现有缓存文件的差异来判断是否发生了任何更改</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ./opcache_malware_hunt.py</span><br><span class="line">Usage : ./opcache_malware_hunt.py [opcache_folder] [system_id] [php.ini]</span><br></pre></td></tr></table></figure>
+<p><img src="/2018/01/13/opcache那些事/malware_hunter.png" alt="image"><br>OPcache Disassembler用于反编译opcache文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ ./opcache_disassembler.py</span><br><span class="line">Usage : ./opcache_disassembler.py [-tc] [file]</span><br><span class="line">    -t Print syntax tree</span><br><span class="line">    -c Print pseudocode</span><br></pre></td></tr></table></figure>
+<p>提供了两种显示选项，语法树和伪代码，伪代码更容易理解</p>
+<p>参考链接：<a href="http://blog.gosecure.ca/2016/04/27/binary-webshell-through-opcache-in-php-7/" target="_blank" rel="noopener">http://blog.gosecure.ca/2016/04/27/binary-webshell-through-opcache-in-php-7/</a></p>
+  
+	</div>
+
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/PHP/">PHP</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Opcache/">Opcache</a><a href="/tags/php/">php</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://michaelwayneliu.github.io/2018/01/13/opcache那些事/" data-title="opcache那些事 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/01/13/实时监视服务资源占用and报警/" title="实时监视服务资源占用and报警">
+  <strong>上一篇：</strong><br/>
+  <span>
+  实时监视服务资源占用and报警</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/01/13/burp错误解决/"  title="burp错误解决">
+ <strong>下一篇：</strong><br/> 
+ <span>burp错误解决
+</span>
+</a>
+</div>
+
+</nav>
+
+
+<!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zMjUxMS85MDcy">
+<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+</script>
+<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+
+
+	
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#opcache原理"><span class="toc-number">1.</span> <span class="toc-text"><a href="#opcache&#x539F;&#x7406;" class="headerlink" title="opcache&#x539F;&#x7406;"></a>opcache&#x539F;&#x7406;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何利用"><span class="toc-number">2.</span> <span class="toc-text"><a href="#&#x5982;&#x4F55;&#x5229;&#x7528;" class="headerlink" title="&#x5982;&#x4F55;&#x5229;&#x7528;"></a>&#x5982;&#x4F55;&#x5229;&#x7528;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#本地检测"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x672C;&#x5730;&#x68C0;&#x6D4B;" class="headerlink" title="&#x672C;&#x5730;&#x68C0;&#x6D4B;"></a>&#x672C;&#x5730;&#x68C0;&#x6D4B;</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/PHP/" title="PHP">PHP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/前端安全/" title="前端安全">前端安全<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/博客/" title="博客">博客<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/后端安全/" title="后端安全">后端安全<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工具/" title="工具">工具<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/运维/" title="运维">运维<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/JSONP/" title="JSONP">JSONP<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XSS/" title="XSS">XSS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/反弹shell/" title="反弹shell">反弹shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/序列化/" title="序列化">序列化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HTTPS/" title="HTTPS">HTTPS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/错误/" title="错误">错误<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/php/" title="php">php<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客迁移/" title="博客迁移">博客迁移<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/jacman主题配置/" title="jacman主题配置">jacman主题配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/混淆/" title="混淆">混淆<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JS/" title="JS">JS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/资源监控/" title="资源监控">资源监控<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/服务器/" title="服务器">服务器<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向/" title="逆向">逆向<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/pyc/" title="pyc">pyc<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blackwolfsec.cc" target="_blank" title="blackwolf">blackwolf</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=2639885925&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m MS in SCU. <br/>
+			Just have a little faith.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/杀手莱昂的美丽人生" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="MS">MS</a>
+		
+		
+		</p>
+</div>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+      Total visits: <span id="busuanzi_value_site_pv"></span>
+</span>
+<span id="busuanzi_container_site_uv">
+      You are Visiter No.<span id="busuanzi_value_site_uv"></span>
+</span>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'msarehere';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255712369'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255712369' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  </body>
+</html>
