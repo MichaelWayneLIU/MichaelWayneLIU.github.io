@@ -11,9 +11,9 @@
         <title>Joomla! XSS过滤规则</title>
         <pubTime>2018-01-19T08:51:46.000Z</pubTime>
         
-        <tag>XSS</tag>
-         
         <tag>Joomla!</tag>
+         
+        <tag>XSS</tag>
          
          
            
@@ -191,9 +191,9 @@
         <title>SOME攻击</title>
         <pubTime>2017-12-21T13:54:47.000Z</pubTime>
         
-        <tag>SOME攻击</tag>
-         
         <tag>XSS</tag>
+         
+        <tag>SOME攻击</tag>
          
         <tag>JSONP</tag>
          

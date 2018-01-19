@@ -34,9 +34,9 @@
       <category term="前端安全" scheme="https://michaelwayneliu.github.io/categories/%E5%89%8D%E7%AB%AF%E5%AE%89%E5%85%A8/"/>
     
     
-      <category term="XSS" scheme="https://michaelwayneliu.github.io/tags/XSS/"/>
-    
       <category term="Joomla!" scheme="https://michaelwayneliu.github.io/tags/Joomla/"/>
+    
+      <category term="XSS" scheme="https://michaelwayneliu.github.io/tags/XSS/"/>
     
   </entry>
   
@@ -206,9 +206,9 @@
       <category term="前端安全" scheme="https://michaelwayneliu.github.io/categories/%E5%89%8D%E7%AB%AF%E5%AE%89%E5%85%A8/"/>
     
     
-      <category term="SOME攻击" scheme="https://michaelwayneliu.github.io/tags/SOME%E6%94%BB%E5%87%BB/"/>
-    
       <category term="XSS" scheme="https://michaelwayneliu.github.io/tags/XSS/"/>
+    
+      <category term="SOME攻击" scheme="https://michaelwayneliu.github.io/tags/SOME%E6%94%BB%E5%87%BB/"/>
     
       <category term="JSONP" scheme="https://michaelwayneliu.github.io/tags/JSONP/"/>
     
