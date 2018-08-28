@@ -19,10 +19,12 @@
 <meta property="og:site_name" content="MSAREHERE">
 <meta property="og:description" content="JS内网主机扫描和端口扫描姿势总结">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-08-28T03:37:56.962Z">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2018/08/28/JS内网主机扫描和端口扫描姿势总结/response.jpg">
+<meta property="og:updated_time" content="2018-08-28T04:13:01.484Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JS内网主机扫描和端口扫描姿势总结">
 <meta name="twitter:description" content="JS内网主机扫描和端口扫描姿势总结">
+<meta name="twitter:image" content="https://michaelwayneliu.github.io/2018/08/28/JS内网主机扫描和端口扫描姿势总结/response.jpg">
 
     
     <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
@@ -104,11 +106,12 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描内网主机"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;" class="headerlink" title="&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;"></a>&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描主机端口"><span class="toc-number">2.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;" class="headerlink" title="&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;"></a>&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Cross-Origin-Requests和WebSockets"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#Cross-Origin-Requests&#x548C;WebSockets" class="headerlink" title="Cross Origin Requests&#x548C;WebSockets"></a>Cross Origin Requests&#x548C;WebSockets</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#利用跨域标签发起请求"><span class="toc-number">2.2.</span> <span class="toc-text"><a href="#&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;" class="headerlink" title="&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;"></a>&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;</span></a></li></ol></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#"><span class="toc-number">1.</span> <span class="toc-text"><a href="#" class="headerlink" title=""></a><a id="more"></a></span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描内网主机"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;" class="headerlink" title="&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;"></a>&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描主机端口"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;" class="headerlink" title="&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;"></a>&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Cross-Origin-Requests和WebSockets"><span class="toc-number">1.2.1.</span> <span class="toc-text"><a href="#Cross-Origin-Requests&#x548C;WebSockets" class="headerlink" title="Cross Origin Requests&#x548C;WebSockets"></a>Cross Origin Requests&#x548C;WebSockets</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#利用跨域标签发起请求"><span class="toc-number">1.2.2.</span> <span class="toc-text"><a href="#&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;" class="headerlink" title="&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;"></a>&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;</span></a></li></ol></li></ol></li></ol>
 		
 		</div>
 		
-		<p>JS内网主机扫描和端口扫描姿势总结<br><a id="more"></a><br>本文章的例子都只能针对内网主机进行扫描。先给出一些例子，每个例子的原理都不一样，接下来将对它们的原理进行分析。</p>
+		<p>JS内网主机扫描和端口扫描姿势总结</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><a id="more"></a></h2><p>本文章的例子都只能针对内网主机进行扫描。先给出一些例子，每个例子的原理都不一样，接下来将对它们的原理进行分析。</p>
 <p>主机发现</p>
 <ul>
 <li><a href="https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/scan.html">https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/scan.html</a></li>
@@ -148,6 +151,16 @@
 <p><strong>tips</strong>:根据readyState属性可以判断webSocket的连接状态，该属性的值可以是下面几种：<br>0 ：对应常量CONNECTING (numeric value 0)，<br> 正在建立连接连接，还没有完成。The connection has not yet been established.<br>1 ：对应常量OPEN (numeric value 1)，<br> 连接成功建立，可以进行通信。The WebSocket connection is established and communication is possible.<br>2 ：对应常量CLOSING (numeric value 2)<br> 连接正在进行关闭握手，即将关闭。The connection is going through the closing handshake.<br>3 : 对应常量CLOSED (numeric value 3)<br> 连接已经关闭或者根本没有建立。The connection has been closed or could not be opened.</p>
 </blockquote>
 <p>于是我们可以知道，我们要观察的是从刚开始发起请求到能获取到目标返回的请求的这段时间，观察它能持续多久。通过这个时间就可以区分端口是否开放等状态。</p>
+<p>以这种方式执行端口扫描有一些限制。主要限制是所有浏览器阻止连接到众所周知的端口，因此无法扫描它们。另一个限制是这些是应用程序级扫描，不像nmap这样的工具执行的套接字级别扫描。这意味着，基于在特定端口上侦听的应用程序的性质，响应和解释可能会有所不同。</p>
+<p>应用程序有四种类型的响应：</p>
+<ul>
+<li>关闭连接：由于协议不匹配，应用程序会在建立连接后立即终止连接</li>
+<li>在连接时响应和关闭：与类型1类似，但在关闭连接之前，它会发送一些默认响应</li>
+<li>打开时无响应：应用程序保持连接打开，期望更多数据或数据符合其协议规范</li>
+<li>打开响应：类似于类型3，但在连接上发送一些默认响应，如banner或欢迎消息</li>
+</ul>
+<p>每种类型的WebSockets和COR的行为如下表所示。</p>
+<p><img src="/2018/08/28/JS内网主机扫描和端口扫描姿势总结/response.jpg" alt="image"></p>
 <p>举个例子，向某个目标的端口发起XHR请求。首先，在内网一般存在一些默认防火墙拦截掉的端口，没有很大必要再去扫描。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var blocked_ports = [0,1,7,9,11,13,15,17,19,20,21,22,23,25,37,42,43,53,77,79,87,95,101,102,103,104,109,110,111,113,115,117,119,123,135,139,143,179,389,465,512,513,514,515,526,530,531,532,540,556,563,587,601,636,993,995,2049,4045,6000];</span><br></pre></td></tr></table></figure>
 <p>接着对目标端口发起XHR请求</p>
@@ -200,6 +213,14 @@
 	
 <nav class="article-nav clearfix">
  
+ <div class="prev" >
+ <a href="/2018/08/28/sqlmap在https情况下的一个错误/" title="sqlmap在https情况下的一个错误">
+  <strong>上一篇：</strong><br/>
+  <span>
+  sqlmap在https情况下的一个错误</span>
+</a>
+</div>
+
 
 <div class="next">
 <a href="/2018/08/28/sqlmap-burp绕过csrf/"  title="sqlmap+burp绕过csrf">
@@ -248,7 +269,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描内网主机"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;" class="headerlink" title="&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;"></a>&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描主机端口"><span class="toc-number">2.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;" class="headerlink" title="&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;"></a>&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Cross-Origin-Requests和WebSockets"><span class="toc-number">2.1.</span> <span class="toc-text"><a href="#Cross-Origin-Requests&#x548C;WebSockets" class="headerlink" title="Cross Origin Requests&#x548C;WebSockets"></a>Cross Origin Requests&#x548C;WebSockets</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#利用跨域标签发起请求"><span class="toc-number">2.2.</span> <span class="toc-text"><a href="#&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;" class="headerlink" title="&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;"></a>&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;</span></a></li></ol></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#"><span class="toc-number">1.</span> <span class="toc-text"><a href="#" class="headerlink" title=""></a><a id="more"></a></span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描内网主机"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;" class="headerlink" title="&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;"></a>&#x626B;&#x63CF;&#x5185;&#x7F51;&#x4E3B;&#x673A;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#扫描主机端口"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;" class="headerlink" title="&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;"></a>&#x626B;&#x63CF;&#x4E3B;&#x673A;&#x7AEF;&#x53E3;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Cross-Origin-Requests和WebSockets"><span class="toc-number">1.2.1.</span> <span class="toc-text"><a href="#Cross-Origin-Requests&#x548C;WebSockets" class="headerlink" title="Cross Origin Requests&#x548C;WebSockets"></a>Cross Origin Requests&#x548C;WebSockets</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#利用跨域标签发起请求"><span class="toc-number">1.2.2.</span> <span class="toc-text"><a href="#&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;" class="headerlink" title="&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;"></a>&#x5229;&#x7528;&#x8DE8;&#x57DF;&#x6807;&#x7B7E;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;</span></a></li></ol></li></ol></li></ol>
  
   </div>
 
@@ -281,7 +302,7 @@
 		  
 		
 		  
-			<li><a href="/categories/工具/" title="工具">工具<sup>2</sup></a></li>
+			<li><a href="/categories/工具/" title="工具">工具<sup>3</sup></a></li>
 		  
 		
 		  
@@ -302,39 +323,23 @@
 			
 		
 			
-				<li><a href="/tags/JS/" title="JS">JS<sup>2</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/JSONP/" title="JSONP">JSONP<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Joomla/" title="Joomla!">Joomla!<sup>1</sup></a></li>
+				<li><a href="/tags/JS/" title="JS">JS<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/pyc/" title="pyc">pyc<sup>1</sup></a></li>
+				<li><a href="/tags/HTTPS/" title="HTTPS">HTTPS<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HTTPS/" title="HTTPS">HTTPS<sup>1</sup></a></li>
+				<li><a href="/tags/注入/" title="注入">注入<sup>2</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/错误/" title="错误">错误<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/主机发现/" title="主机发现">主机发现<sup>1</sup></a></li>
 			
 		
 			
@@ -358,7 +363,7 @@
 			
 		
 			
-				<li><a href="/tags/端口扫描/" title="端口扫描">端口扫描<sup>1</sup></a></li>
+				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
 			
 		
 			
@@ -366,15 +371,31 @@
 			
 		
 			
-				<li><a href="/tags/注入/" title="注入">注入<sup>1</sup></a></li>
+				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/端口扫描/" title="端口扫描">端口扫描<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Joomla/" title="Joomla!">Joomla!<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/主机发现/" title="主机发现">主机发现<sup>1</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/CSRF/" title="CSRF">CSRF<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/BURP/" title="BURP">BURP<sup>1</sup></a></li>
 			
 		
 		</ul>
