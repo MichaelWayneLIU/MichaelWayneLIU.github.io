@@ -86,6 +86,75 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2018/08/28/【CTF】MD5截断比较/" title="【CTF】MD5截断比较" itemprop="url">【CTF】MD5截断比较</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
+		
+  <p class="article-time">
+    <time datetime="2018-08-28T02:48:43.000Z" itemprop="datePublished"> 发表于 2018-08-28</time>
+    <span id="busuanzi_container_page_pv">
+    总阅读<span id="busuanzi_value_page_pv"></span>次
+</span>
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。</p>
+<p>生成脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import hashlib</span><br><span class="line">sum = []</span><br><span class="line">j = 0</span><br><span class="line">f = open(&quot;gen_md5.txt&quot;, &quot;a&quot;)</span><br><span class="line">for i in xrange(1000000000):</span><br><span class="line">    tmp = (hashlib.md5(str(i)).hexdigest(),i)</span><br><span class="line">    sum.append(tmp)</span><br><span class="line">    j = j+1</span><br><span class="line">    if(j==10000000):</span><br><span class="line">        for i in sum:</span><br><span class="line">            f.write(&quot;&#123;0&#125; &#123;1&#125;&quot;.format(i,&quot;\n&quot;))</span><br><span class="line">        j=0</span><br><span class="line">        sum = []</span><br><span class="line">f.close()</span><br></pre></td></tr></table></figure>
+<p>使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat gen_md5.txt | grep  \(\&apos;54d7ed</span><br></pre></td></tr></table></figure></p>
+<p>匹配前几位，grep支持正则-E很方便。</p>
+<p>或者使用python匹配</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">class Load_Corpus_with_Iteration(object): # 使用迭代器读取</span><br><span class="line">    def __init__(self, path):</span><br><span class="line">        self.path = path</span><br><span class="line"> </span><br><span class="line">    def __iter__(self):</span><br><span class="line">        for line in open(self.path):</span><br><span class="line">            yield line.split()</span><br><span class="line"> </span><br><span class="line">corpus = Load_Corpus_with_Iteration(&apos;gen_md5.txt&apos;)</span><br><span class="line">for item in corpus:</span><br><span class="line">    # print item</span><br><span class="line">    if(item[0].startswith(&quot;(&apos;3322cf&quot;)):</span><br><span class="line">        print item</span><br></pre></td></tr></table></figure>
+<p>参考链接：</p>
+<p><a href="http://www.beesfun.com/2017/03/21/【CTF】MD5截断比较/" target="_blank" rel="noopener">http://www.beesfun.com/2017/03/21/【CTF】MD5截断比较/</a></p>
+<p><a href="https://strcpy.me/index.php/archives/685/" target="_blank" rel="noopener">https://strcpy.me/index.php/archives/685/</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/CTF/">CTF</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/08/28/【CTF】MD5截断比较/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+  
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2018/01/19/Joomla-XSS过滤规则/" title="Joomla! XSS过滤规则" itemprop="url">Joomla! XSS过滤规则</a>
   </h1>
   <p class="article-author">By
@@ -344,72 +413,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/01/13/opcache那些事/" title="opcache那些事" itemprop="url">opcache那些事</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
-		
-  <p class="article-time">
-    <time datetime="2018-01-13T01:52:53.000Z" itemprop="datePublished"> 发表于 2018-01-13</time>
-    <span id="busuanzi_container_page_pv">
-    总阅读<span id="busuanzi_value_page_pv"></span>次
-</span>
-  </p>
-</header>
-    <div class="article-content">
-        
-        <p>在 PHP 7.0 发布之初，就有不少 PHP 开发人员对其性能提升方面非常关注。在引入 OPcache 后，PHP的性能的确有了很大的提升，之后，很多开发人员都开始采用 OPcache 作为 PHP 应用的加速器。OPcache 带来良好性能的同时也带来了新的安全隐患。<br></p>
-        
-        
-        <p class="article-more-link">
-          
-            <a href="/2018/01/13/opcache那些事/#more">Read More</a>
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/PHP/">PHP</a>
-</div>
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Opcache/">Opcache</a><a href="/tags/php/">php</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-	  	<span></span>
-		<a href="/2018/01/13/opcache那些事/#disqus_thread" class="comments-count-link">Comments</a>
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-  
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
@@ -472,19 +475,7 @@
 			
 		
 			
-				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Joomla/" title="Joomla!">Joomla!<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
+				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
 			
 		
 			
@@ -492,19 +483,15 @@
 			
 		
 			
+				<li><a href="/tags/Joomla/" title="Joomla!">Joomla!<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/反弹shell/" title="反弹shell">反弹shell<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/php/" title="php">php<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/HTTPS/" title="HTTPS">HTTPS<sup>1</sup></a></li>
+				<li><a href="/tags/CTF/" title="CTF">CTF<sup>1</sup></a></li>
 			
 		
 			
@@ -517,6 +504,14 @@
 		
 			
 				<li><a href="/tags/jacman主题配置/" title="jacman主题配置">jacman主题配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/php/" title="php">php<sup>1</sup></a></li>
 			
 		
 			
@@ -536,11 +531,19 @@
 			
 		
 			
-				<li><a href="/tags/逆向/" title="逆向">逆向<sup>1</sup></a></li>
+				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/pyc/" title="pyc">pyc<sup>1</sup></a></li>
+				<li><a href="/tags/HTTPS/" title="HTTPS">HTTPS<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/逆向/" title="逆向">逆向<sup>1</sup></a></li>
 			
 		
 		</ul>

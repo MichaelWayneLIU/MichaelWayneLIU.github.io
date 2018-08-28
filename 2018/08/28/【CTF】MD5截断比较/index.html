@@ -4,25 +4,25 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>burp错误解决 | MSAREHERE</title>
+    <title>【CTF】MD5截断比较 | MSAREHERE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="MS">
     
 
     
-    <meta name="description" content="burp抓https包出现页面无返回情况">
-<meta name="keywords" content="Burp,HTTPS,错误">
+    <meta name="description" content="ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。 生成脚本 123456789101112131415# -*- coding: utf-8 -*-import hashlibsum = []j = 0f = open(&amp;quot;gen_md5.txt&amp;quot;, &amp;quot;a&amp;quot;)for i in xran">
+<meta name="keywords" content="CTF">
 <meta property="og:type" content="article">
-<meta property="og:title" content="burp错误解决">
-<meta property="og:url" content="https://michaelwayneliu.github.io/2018/01/13/burp错误解决/index.html">
+<meta property="og:title" content="【CTF】MD5截断比较">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2018/08/28/【CTF】MD5截断比较/index.html">
 <meta property="og:site_name" content="MSAREHERE">
-<meta property="og:description" content="burp抓https包出现页面无返回情况">
+<meta property="og:description" content="ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。 生成脚本 123456789101112131415# -*- coding: utf-8 -*-import hashlibsum = []j = 0f = open(&amp;quot;gen_md5.txt&amp;quot;, &amp;quot;a&amp;quot;)for i in xran">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-01-13T01:47:50.332Z">
+<meta property="og:updated_time" content="2018-08-28T02:49:32.265Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="burp错误解决">
-<meta name="twitter:description" content="burp抓https包出现页面无返回情况">
+<meta name="twitter:title" content="【CTF】MD5截断比较">
+<meta name="twitter:description" content="ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。 生成脚本 123456789101112131415# -*- coding: utf-8 -*-import hashlibsum = []j = 0f = open(&amp;quot;gen_md5.txt&amp;quot;, &amp;quot;a&amp;quot;)for i in xran">
 
     
     <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
@@ -86,14 +86,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/01/13/burp错误解决/" title="burp错误解决" itemprop="url">burp错误解决</a>
+      <a href="/2018/08/28/【CTF】MD5截断比较/" title="【CTF】MD5截断比较" itemprop="url">【CTF】MD5截断比较</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-13T01:35:29.000Z" itemprop="datePublished"> 发表于 2018-01-13</time>
+    <time datetime="2018-08-28T02:48:43.000Z" itemprop="datePublished"> 发表于 2018-08-28</time>
     <span id="busuanzi_container_page_pv">
     总阅读<span id="busuanzi_value_page_pv"></span>次
 </span>
@@ -108,24 +108,26 @@
 		
 		</div>
 		
-		<p>burp抓https包出现页面无返回情况<br><a id="more"></a><br>burp抓https包出现页面无返回情况，F12定位资源请求发现某个页面的返回头中X-Frame-Options值设为DENY，<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/X-Frame-Options" target="_blank" rel="noopener">参考</a><br>单独请求该资源，得到错误<strong>handshake alert: unrecognized_name</strong>，google之，是SSL在JAVA7中的实现问题，使用如下命令启动burp，解决</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Djsse.enableSNIExtension=false -jar burpsuite_pro_v1.X.jar</span><br></pre></td></tr></table></figure>
-<p>这会禁止服务器名称暗示扩展–Server Name Indication (SNI) extension，让JAVA忽略Unrecognized Name这个错误。在user options–&gt;SSL也可以Disable Java SNI extension</p>
+		<p>ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。</p>
+<p>生成脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import hashlib</span><br><span class="line">sum = []</span><br><span class="line">j = 0</span><br><span class="line">f = open(&quot;gen_md5.txt&quot;, &quot;a&quot;)</span><br><span class="line">for i in xrange(1000000000):</span><br><span class="line">    tmp = (hashlib.md5(str(i)).hexdigest(),i)</span><br><span class="line">    sum.append(tmp)</span><br><span class="line">    j = j+1</span><br><span class="line">    if(j==10000000):</span><br><span class="line">        for i in sum:</span><br><span class="line">            f.write(&quot;&#123;0&#125; &#123;1&#125;&quot;.format(i,&quot;\n&quot;))</span><br><span class="line">        j=0</span><br><span class="line">        sum = []</span><br><span class="line">f.close()</span><br></pre></td></tr></table></figure>
+<p>使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat gen_md5.txt | grep  \(\&apos;54d7ed</span><br></pre></td></tr></table></figure></p>
+<p>匹配前几位，grep支持正则-E很方便。</p>
+<p>或者使用python匹配</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">class Load_Corpus_with_Iteration(object): # 使用迭代器读取</span><br><span class="line">    def __init__(self, path):</span><br><span class="line">        self.path = path</span><br><span class="line"> </span><br><span class="line">    def __iter__(self):</span><br><span class="line">        for line in open(self.path):</span><br><span class="line">            yield line.split()</span><br><span class="line"> </span><br><span class="line">corpus = Load_Corpus_with_Iteration(&apos;gen_md5.txt&apos;)</span><br><span class="line">for item in corpus:</span><br><span class="line">    # print item</span><br><span class="line">    if(item[0].startswith(&quot;(&apos;3322cf&quot;)):</span><br><span class="line">        print item</span><br></pre></td></tr></table></figure>
+<p>参考链接：</p>
+<p><a href="http://www.beesfun.com/2017/03/21/【CTF】MD5截断比较/" target="_blank" rel="noopener">http://www.beesfun.com/2017/03/21/【CTF】MD5截断比较/</a></p>
+<p><a href="https://strcpy.me/index.php/archives/685/" target="_blank" rel="noopener">https://strcpy.me/index.php/archives/685/</a></p>
   
 	</div>
 
 		<footer class="article-footer clearfix">
 <div class="article-catetags">
 
-<div class="article-categories">
-  <span></span>
-  <a class="article-category-link" href="/categories/工具/">工具</a>
-</div>
-
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Burp/">Burp</a><a href="/tags/HTTPS/">HTTPS</a><a href="/tags/错误/">错误</a>
+  <span></span> <a href="/tags/CTF/">CTF</a>
   </div>
 
 </div>
@@ -134,7 +136,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://michaelwayneliu.github.io/2018/01/13/burp错误解决/" data-title="burp错误解决 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  <div data-url="https://michaelwayneliu.github.io/2018/08/28/【CTF】MD5截断比较/" data-title="【CTF】MD5截断比较 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -147,19 +149,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2018/01/13/opcache那些事/" title="opcache那些事">
-  <strong>上一篇：</strong><br/>
-  <span>
-  opcache那些事</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2018/01/12/service-worker-xss进化/"  title="service worker--xss进化">
+<a href="/2018/01/19/Joomla-XSS过滤规则/"  title="Joomla! XSS过滤规则">
  <strong>下一篇：</strong><br/> 
- <span>service worker--xss进化
+ <span>Joomla! XSS过滤规则
 </span>
 </a>
 </div>
