@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="MSAREHERE">
 <meta property="og:description" content="JS内网主机扫描和端口扫描姿势总结">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-08-28T03:25:32.795Z">
+<meta property="og:updated_time" content="2018-08-28T03:37:56.962Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JS内网主机扫描和端口扫描姿势总结">
 <meta name="twitter:description" content="JS内网主机扫描和端口扫描姿势总结">
@@ -108,7 +108,17 @@
 		
 		</div>
 		
-		<p>JS内网主机扫描和端口扫描姿势总结<br><a id="more"></a></p>
+		<p>JS内网主机扫描和端口扫描姿势总结<br><a id="more"></a><br>本文章的例子都只能针对内网主机进行扫描。先给出一些例子，每个例子的原理都不一样，接下来将对它们的原理进行分析。</p>
+<p>主机发现</p>
+<ul>
+<li><a href="https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/scan.html">https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/scan.html</a></li>
+</ul>
+<p>端口扫描</p>
+<ul>
+<li><a href="https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/portscan.html">https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/portscan.html</a></li>
+<li><a href="https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/portscan1.html">https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/portscan1.html</a></li>
+<li><a href="https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/portscan2.html">https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/portscan/portscan2.html</a></li>
+</ul>
 <h3 id="扫描内网主机"><a href="#扫描内网主机" class="headerlink" title="扫描内网主机"></a>扫描内网主机</h3><p>获取本机内网IP地址可以使用WebRTC协议。在使用PeerConnection接口来建立点对点连接时，其中的一步onicecandidate通过ICE标准获取到自己的IP和端口号。</p>
 <p>ICE（Interactive Connectivity Establishment，交互连接建立）：由于端与端之间存在多层防火墙和NAT设备阻隔，因此我们需要一种机制来收集两端之间公共线路的IP，而ICE则是干这件事的好帮手。</p>
 <ol>
@@ -292,27 +302,11 @@
 			
 		
 			
-				<li><a href="/tags/JSONP/" title="JSONP">JSONP<sup>2</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/JS/" title="JS">JS<sup>2</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/XXE攻击/" title="XXE攻击">XXE攻击<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/JSON/" title="JSON">JSON<sup>1</sup></a></li>
+				<li><a href="/tags/JSONP/" title="JSONP">JSONP<sup>2</sup></a></li>
 			
 		
 			
@@ -320,11 +314,7 @@
 			
 		
 			
-				<li><a href="/tags/端口扫描/" title="端口扫描">端口扫描<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/主机发现/" title="主机发现">主机发现<sup>1</sup></a></li>
+				<li><a href="/tags/pyc/" title="pyc">pyc<sup>1</sup></a></li>
 			
 		
 			
@@ -340,6 +330,26 @@
 			
 		
 			
+				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/主机发现/" title="主机发现">主机发现<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XXE攻击/" title="XXE攻击">XXE攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XML/" title="XML">XML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JSON/" title="JSON">JSON<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/序列化/" title="序列化">序列化<sup>1</sup></a></li>
 			
 		
@@ -348,15 +358,11 @@
 			
 		
 			
-				<li><a href="/tags/XML/" title="XML">XML<sup>1</sup></a></li>
+				<li><a href="/tags/端口扫描/" title="端口扫描">端口扫描<sup>1</sup></a></li>
 			
 		
 			
 				<li><a href="/tags/php/" title="php">php<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
 			
 		
 			
@@ -365,6 +371,10 @@
 		
 			
 				<li><a href="/tags/CSRF/" title="CSRF">CSRF<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/BURP/" title="BURP">BURP<sup>1</sup></a></li>
 			
 		
 		</ul>
