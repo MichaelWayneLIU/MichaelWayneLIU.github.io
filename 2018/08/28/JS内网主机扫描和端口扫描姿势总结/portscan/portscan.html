@@ -1,0 +1,63 @@
+ 
+Javascript Port Scan<br /><br />
+<form>
+Target:
+<input type="text" name="target" value="www.baidu.com" />
+Port:
+<input type="text" name="port" value="80" />
+Timeout:
+<input type="text" name="timeout" value="1000" /><br /><br />
+<label for="result">Result:</label><br />
+<p id="p1"></p>
+<textarea id="result" name="result" rows="10" cols="50"></textarea><br /><input class="button" type="button" value="SCAN" onclick="javascript:scan(this.form)" /></form>
+
+
+<script>
+
+var target="www.baidu.com";
+var port=80;
+var timeout=1000;
+ 
+function scanPort(target,port,timeout)
+{
+	var img=new Image();
+	img.onerror=function ()
+	{
+		if (!img) return;
+		img=undefined;
+		out(target,port,"open");
+	}
+	
+	img.onload=img.onerror;
+	img.src='http://'+target+':'+port;
+		
+	setTimeout(function() {
+		if (!img) return;
+        img = undefined;
+		out(target,port,"close");
+		},timeout);
+	
+}
+ 
+ 
+function scanTarget(target,port,timeout)
+{
+	for(i=0;i<port.length;i++)
+		scanPort(target,port[i],timeout);
+}
+ 
+ 
+var out=function(target,port,status) {
+	result.value+=target+':'+port+'  '+status+"\n";
+	// document.write("<a>"+target+':'+port+'  '+status+"\n"+"</a>");
+	};
+ 
+ 
+var scan=function(form)
+{
+	scanTarget(form.target.value, form.port.value.split(','), form.timeout.value)
+	
+}
+
+scanTarget("127.0.0.1", "800".split(','), 1000);
+</script>
