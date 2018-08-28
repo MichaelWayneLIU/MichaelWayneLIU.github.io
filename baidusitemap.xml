@@ -4,6 +4,54 @@
 
     
   <url>
+    <loc>https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/</loc>
+    <lastmod>2018-08-28T03:25:32.795Z</lastmod>
+    <data>
+        <display>
+        <title>JS内网主机扫描和端口扫描姿势总结</title>
+        <pubTime>2018-08-28T03:23:46.000Z</pubTime>
+        
+        <tag>JS</tag>
+         
+        <tag>端口扫描</tag>
+         
+        <tag>主机发现</tag>
+         
+         
+           
+             
+              <breadCrumb title="工具" url="https://michaelwayneliu.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://michaelwayneliu.github.io/2018/08/28/sqlmap-burp%E7%BB%95%E8%BF%87csrf/</loc>
+    <lastmod>2018-08-28T03:21:47.585Z</lastmod>
+    <data>
+        <display>
+        <title>sqlmap+burp绕过csrf</title>
+        <pubTime>2018-08-28T03:20:31.000Z</pubTime>
+        
+        <tag>注入</tag>
+         
+        <tag>CSRF</tag>
+         
+        <tag>BURP</tag>
+         
+         
+           
+             
+              <breadCrumb title="后端安全" url="https://michaelwayneliu.github.io/categories/%E5%90%8E%E7%AB%AF%E5%AE%89%E5%85%A8/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://michaelwayneliu.github.io/2018/08/28/XXE%E6%94%BB%E5%87%BB%E9%82%A3%E4%BA%9B%E4%BA%8B/</loc>
     <lastmod>2018-08-28T03:16:06.022Z</lastmod>
     <data>
@@ -76,9 +124,9 @@
         <title>一例js混淆分析</title>
         <pubTime>2018-01-13T02:46:21.000Z</pubTime>
         
-        <tag>混淆</tag>
-         
         <tag>JS</tag>
+         
+        <tag>混淆</tag>
          
          
            

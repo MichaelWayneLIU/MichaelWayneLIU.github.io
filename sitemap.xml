@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://michaelwayneliu.github.io/2018/08/28/JS%E5%86%85%E7%BD%91%E4%B8%BB%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%92%8C%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/</loc>
+    
+    <lastmod>2018-08-28T03:25:32.795Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://michaelwayneliu.github.io/2018/08/28/sqlmap-burp%E7%BB%95%E8%BF%87csrf/</loc>
+    
+    <lastmod>2018-08-28T03:21:47.585Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://michaelwayneliu.github.io/2018/08/28/XXE%E6%94%BB%E5%87%BB%E9%82%A3%E4%BA%9B%E4%BA%8B/</loc>
     
     <lastmod>2018-08-28T03:16:06.022Z</lastmod>
