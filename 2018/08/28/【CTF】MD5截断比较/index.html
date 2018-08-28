@@ -11,18 +11,18 @@
     
 
     
-    <meta name="description" content="ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。 生成脚本 123456789101112131415# -*- coding: utf-8 -*-import hashlibsum = []j = 0f = open(&amp;quot;gen_md5.txt&amp;quot;, &amp;quot;a&amp;quot;)for i in xran">
-<meta name="keywords" content="CTF">
+    <meta name="description" content="ctf中经常用MD5的截断比较做验证。">
+<meta name="keywords" content="CTF,MD5">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【CTF】MD5截断比较">
 <meta property="og:url" content="https://michaelwayneliu.github.io/2018/08/28/【CTF】MD5截断比较/index.html">
 <meta property="og:site_name" content="MSAREHERE">
-<meta property="og:description" content="ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。 生成脚本 123456789101112131415# -*- coding: utf-8 -*-import hashlibsum = []j = 0f = open(&amp;quot;gen_md5.txt&amp;quot;, &amp;quot;a&amp;quot;)for i in xran">
+<meta property="og:description" content="ctf中经常用MD5的截断比较做验证。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-08-28T02:49:32.265Z">
+<meta property="og:updated_time" content="2018-08-28T03:03:44.638Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="【CTF】MD5截断比较">
-<meta name="twitter:description" content="ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。 生成脚本 123456789101112131415# -*- coding: utf-8 -*-import hashlibsum = []j = 0f = open(&amp;quot;gen_md5.txt&amp;quot;, &amp;quot;a&amp;quot;)for i in xran">
+<meta name="twitter:description" content="ctf中经常用MD5的截断比较做验证。">
 
     
     <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
@@ -108,7 +108,7 @@
 		
 		</div>
 		
-		<p>ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。</p>
+		<p>ctf中经常用MD5的截断比较做验证。<br><a id="more"></a><br>ctf中经常用MD5的截断比较做验证。可以使用空间换时间。改了下别人的脚本，几分钟生成了6个多G文件，觉得差不多就停了。。。</p>
 <p>生成脚本</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import hashlib</span><br><span class="line">sum = []</span><br><span class="line">j = 0</span><br><span class="line">f = open(&quot;gen_md5.txt&quot;, &quot;a&quot;)</span><br><span class="line">for i in xrange(1000000000):</span><br><span class="line">    tmp = (hashlib.md5(str(i)).hexdigest(),i)</span><br><span class="line">    sum.append(tmp)</span><br><span class="line">    j = j+1</span><br><span class="line">    if(j==10000000):</span><br><span class="line">        for i in sum:</span><br><span class="line">            f.write(&quot;&#123;0&#125; &#123;1&#125;&quot;.format(i,&quot;\n&quot;))</span><br><span class="line">        j=0</span><br><span class="line">        sum = []</span><br><span class="line">f.close()</span><br></pre></td></tr></table></figure>
 <p>使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat gen_md5.txt | grep  \(\&apos;54d7ed</span><br></pre></td></tr></table></figure></p>
@@ -127,7 +127,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/CTF/">CTF</a>
+  <span></span> <a href="/tags/CTF/">CTF</a><a href="/tags/MD5/">MD5</a>
   </div>
 
 </div>
@@ -255,11 +255,7 @@
 			
 		
 			
-				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/错误/" title="错误">错误<sup>1</sup></a></li>
+				<li><a href="/tags/博客迁移/" title="博客迁移">博客迁移<sup>1</sup></a></li>
 			
 		
 			
@@ -267,11 +263,15 @@
 			
 		
 			
-				<li><a href="/tags/反弹shell/" title="反弹shell">反弹shell<sup>1</sup></a></li>
+				<li><a href="/tags/Opcache/" title="Opcache">Opcache<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/CTF/" title="CTF">CTF<sup>1</sup></a></li>
+				<li><a href="/tags/php/" title="php">php<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/反弹shell/" title="反弹shell">反弹shell<sup>1</sup></a></li>
 			
 		
 			
@@ -279,19 +279,7 @@
 			
 		
 			
-				<li><a href="/tags/博客迁移/" title="博客迁移">博客迁移<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/jacman主题配置/" title="jacman主题配置">jacman主题配置<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/php/" title="php">php<sup>1</sup></a></li>
+				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
 			
 		
 			
@@ -303,15 +291,23 @@
 			
 		
 			
-				<li><a href="/tags/资源监控/" title="资源监控">资源监控<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/服务器/" title="服务器">服务器<sup>1</sup></a></li>
-			
-		
-			
 				<li><a href="/tags/SOME攻击/" title="SOME攻击">SOME攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/jacman主题配置/" title="jacman主题配置">jacman主题配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CTF/" title="CTF">CTF<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MD5/" title="MD5">MD5<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
 			
 		
 			
@@ -319,11 +315,15 @@
 			
 		
 			
-				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
+				<li><a href="/tags/错误/" title="错误">错误<sup>1</sup></a></li>
 			
 		
 			
-				<li><a href="/tags/逆向/" title="逆向">逆向<sup>1</sup></a></li>
+				<li><a href="/tags/资源监控/" title="资源监控">资源监控<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/服务器/" title="服务器">服务器<sup>1</sup></a></li>
 			
 		
 		</ul>
