@@ -1,0 +1,613 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Web渗透前期信息搜集及自动化工具编写 | MSAREHERE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="MS">
+    
+
+    
+    <meta name="description" content="图片的表现效果会好很多，看图吧">
+<meta name="keywords" content="渗透,信息搜集">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Web渗透前期信息搜集及自动化工具编写">
+<meta property="og:url" content="https://michaelwayneliu.github.io/2019/07/05/Web渗透前期信息搜集及自动化工具编写/index.html">
+<meta property="og:site_name" content="MSAREHERE">
+<meta property="og:description" content="图片的表现效果会好很多，看图吧">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2019/07/05/Web渗透前期信息搜集及自动化工具编写/1.png">
+<meta property="og:image" content="https://michaelwayneliu.github.io/2019/07/05/Web渗透前期信息搜集及自动化工具编写/2.png">
+<meta property="og:updated_time" content="2019-07-08T08:44:38.847Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Web渗透前期信息搜集及自动化工具编写">
+<meta name="twitter:description" content="图片的表现效果会好很多，看图吧">
+<meta name="twitter:image" content="https://michaelwayneliu.github.io/2019/07/05/Web渗透前期信息搜集及自动化工具编写/1.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="MSAREHERE" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="MSAREHERE" title="MSAREHERE"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="MSAREHERE">MSAREHERE</a></h1>
+				<h2 class="blog-motto">Just have a little faith</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">主页 | Home</a></li>
+					
+						<li><a href="/archives">归档 | Archives</a></li>
+					
+						<li><a href="/categories">分类 | Categories</a></li>
+					
+						<li><a href="/tags">标签 | Tags</a></li>
+					
+						<li><a href="/about">关于 | About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:michaelwayneliu.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="w" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/07/05/Web渗透前期信息搜集及自动化工具编写/" title="Web渗透前期信息搜集及自动化工具编写" itemprop="url">Web渗透前期信息搜集及自动化工具编写</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="MS" target="_blank" itemprop="author">MS</a>
+		
+  <p class="article-time">
+    <time datetime="2019-07-05T10:07:25.000Z" itemprop="datePublished"> 发表于 2019-07-05</time>
+    <span id="busuanzi_container_page_pv">
+    总阅读<span id="busuanzi_value_page_pv"></span>次
+</span>
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#信息搜集"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x4FE1;&#x606F;&#x641C;&#x96C6;" class="headerlink" title="&#x4FE1;&#x606F;&#x641C;&#x96C6;"></a>&#x4FE1;&#x606F;&#x641C;&#x96C6;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#技术栈及特点"><span class="toc-number">2.</span> <span class="toc-text"><a href="#&#x6280;&#x672F;&#x6808;&#x53CA;&#x7279;&#x70B9;" class="headerlink" title="&#x6280;&#x672F;&#x6808;&#x53CA;&#x7279;&#x70B9;"></a>&#x6280;&#x672F;&#x6808;&#x53CA;&#x7279;&#x70B9;</span></a></li></ol>
+		
+		</div>
+		
+		<p>图片的表现效果会好很多，看图吧<br><a id="more"></a></p>
+<h3 id="信息搜集"><a href="#信息搜集" class="headerlink" title="信息搜集"></a>信息搜集</h3><p>渗透的本质是信息搜集。高效的获取信息可以帮助下一步的活动。由此有了下图。</p>
+<p><img src="/2019/07/05/Web渗透前期信息搜集及自动化工具编写/1.png" alt=""></p>
+<p>为了实现自动化有了下图。</p>
+<p><img src="/2019/07/05/Web渗透前期信息搜集及自动化工具编写/2.png" alt=""></p>
+<p>当然流程很灵活，可以自定。</p>
+<h3 id="技术栈及特点"><a href="#技术栈及特点" class="headerlink" title="技术栈及特点"></a>技术栈及特点</h3><ul>
+<li>VUE JS + ELEMENT UI + Electron + Nightmare JS + LOWDB + cheerio等</li>
+<li>动态爬取方式爬取信息，接着HTML方式直接进行渲染展示，避免了恼人的标签提取工作。</li>
+<li>静态敏感信息审计，基于<a href="https://github.com/GerbenJavado/LinkFinder，增强了正则匹配能力" target="_blank" rel="noopener">https://github.com/GerbenJavado/LinkFinder，增强了正则匹配能力</a></li>
+<li>模块化，可自定探测规则</li>
+</ul>
+<p>还由很多的不足，继续改进。</p>
+<p>项目链接：<a href="https://github.com/MichaelWayneLIU/InfoScraper" target="_blank" rel="noopener">https://github.com/MichaelWayneLIU/InfoScraper</a></p>
+  
+	</div>
+
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/工具/">工具</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/渗透/">渗透</a><a href="/tags/信息搜集/">信息搜集</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://michaelwayneliu.github.io/2019/07/05/Web渗透前期信息搜集及自动化工具编写/" data-title="Web渗透前期信息搜集及自动化工具编写 | MSAREHERE" data-tsina="2639885925" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2018/08/28/sqlmap在https情况下的一个错误/"  title="sqlmap在https情况下的一个错误">
+ <strong>下一篇：</strong><br/> 
+ <span>sqlmap在https情况下的一个错误
+</span>
+</a>
+</div>
+
+</nav>
+
+
+<!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC8zMjUxMS85MDcy">
+<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+</script>
+<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+
+
+	
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/PHP/" title="PHP">PHP<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/前端安全/" title="前端安全">前端安全<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/博客/" title="博客">博客<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/后端安全/" title="后端安全">后端安全<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/工具/" title="工具">工具<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/运维/" title="运维">运维<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/XSS/" title="XSS">XSS<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JS/" title="JS">JS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JSONP/" title="JSONP">JSONP<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HTTPS/" title="HTTPS">HTTPS<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/注入/" title="注入">注入<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Joomla/" title="Joomla!">Joomla!<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/jacman主题配置/" title="jacman主题配置">jacman主题配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/反弹shell/" title="反弹shell">反弹shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Service-Worker/" title="Service Worker">Service Worker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/主机发现/" title="主机发现">主机发现<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/序列化/" title="序列化">序列化<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Burp/" title="Burp">Burp<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/渗透/" title="渗透">渗透<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/错误/" title="错误">错误<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XXE攻击/" title="XXE攻击">XXE攻击<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XML/" title="XML">XML<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/端口扫描/" title="端口扫描">端口扫描<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLMAP/" title="SQLMAP">SQLMAP<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/信息搜集/" title="信息搜集">信息搜集<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CSRF/" title="CSRF">CSRF<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://blackwolfsec.cc" target="_blank" title="blackwolf">blackwolf</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=2639885925&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m MS in SCU. <br/>
+			Just have a little faith.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/杀手莱昂的美丽人生" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="MS">MS</a>
+		
+		
+		</p>
+</div>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+      Total visits: <span id="busuanzi_value_site_pv"></span>
+</span>
+<span id="busuanzi_container_site_uv">
+      You are Visiter No.<span id="busuanzi_value_site_uv"></span>
+</span>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'msarehere';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255712369'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255712369' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  </body>
+ </html>
